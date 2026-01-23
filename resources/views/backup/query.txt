@@ -1,0 +1,41 @@
+//Update DOB
+UPDATE students
+SET dob = STR_TO_DATE(CONCAT(
+    SUBSTRING(nin, 1, 4), '-',     -- Year
+    SUBSTRING(nin, 5, 2), '-',     -- Month
+    SUBSTRING(nin, 7, 2)           -- Day
+), '%Y-%m-%d')
+WHERE `session_programme_id` = 1 
+AND dob IS NULL
+  AND nin IS NOT NULL
+  AND LENGTH(nin) >= 8
+  AND STR_TO_DATE(CONCAT(
+        SUBSTRING(nin, 1, 4), '-',
+        SUBSTRING(nin, 5, 2), '-',
+        SUBSTRING(nin, 7, 2)
+      ), '%Y-%m-%d') IS NOT NULL;
+
+
+//Preview DOB
+SELECT 
+    nin,
+    STR_TO_DATE(CONCAT(
+        SUBSTRING(nin, 1, 4), '-',  -- Year
+        SUBSTRING(nin, 5, 2), '-',  -- Month
+        SUBSTRING(nin, 7, 2)        -- Day
+    ), '%Y-%m-%d') AS extracted_dob
+FROM your_table
+WHERE dob IS NULL
+  AND nin IS NOT NULL
+  AND LENGTH(nin) >= 8
+  AND STR_TO_DATE(CONCAT(
+        SUBSTRING(nin, 1, 4), '-',
+        SUBSTRING(nin, 5, 2), '-',
+        SUBSTRING(nin, 7, 2)
+      ), '%Y-%m-%d') IS NOT NULL;
+
+
+//Fill age
+UPDATE students
+SET age = TIMESTAMPDIFF(YEAR, dob, '2024-10-02')
+WHERE `session_programme_id` = 1 AND dob IS NOT NULL;

@@ -1,0 +1,6 @@
+@include('layouts.sweet_alerts.success')
+@include('layouts.sweet_alerts.error')
+@include('layouts.sweet_alerts.info')
+@include('layouts.sweet_alerts.confirm_action')
+@include('layouts.sweet_alerts.confirm')
+@include('layouts.sweet_alerts.confirm_delete')
