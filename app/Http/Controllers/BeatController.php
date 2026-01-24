@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Beat;
-use App\Models\BeatLeaderonDuty;
+use App\Models\BeatLeaderOnDuty;
 use App\Models\BeatReserve;
 use App\Models\BeatRound;
 use App\Models\Company;
@@ -315,11 +315,6 @@ class BeatController extends Controller
         ->whereDate('beat_date', $date)
         ->get();
 
-        $leader = BeatLeaderOnDuty::with('student')
-    ->where('company_id', $companyId)
-    ->whereDate('beat_date', $date)
-    ->get();
-
 
     //  Build summary (unchanged)
     $summary = [];
@@ -376,6 +371,8 @@ class BeatController extends Controller
         }
     }
 
+
+    //Generate beats
     public function generateBeats($areas, $studentsByCompany, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
     {
         $beats = [];
@@ -522,9 +519,14 @@ class BeatController extends Controller
                     $studentsToAssign = min($studentsNeeded, $availableStudents);
                     $selectedStudents = $platoonStudents->take($studentsToAssign)->pluck('id')->toArray();
 
-                    $assignedStudentIds = array_merge($assignedStudentIds, $selectedStudents);
-                    $usedStudentIds = array_merge($usedStudentIds, $selectedStudents);
-                }
+                    // $assignedStudentIds = array_merge($assignedStudentIds, $selectedStudents);
+                    // $usedStudentIds = array_merge($usedStudentIds, $selectedStudents);
+                  
+                    // Merge selected students into both assigned and used arrays, remove duplicates, reset keys
+                    $assignedStudentIds = array_values(array_unique(array_merge($assignedStudentIds, $selectedStudents)));
+                    $usedStudentIds     = array_values(array_unique(array_merge($usedStudentIds, $selectedStudents)));
+
+                                }
 
                 // Fill any remaining slots with available students
                 $unfilledSpots = $requiredStudents - count($assignedStudentIds);
@@ -559,6 +561,7 @@ class BeatController extends Controller
         return $beats;
     }
 
+    // Fill Beats
     public function fillBeats(Request $request)
     {
         $date = $request->input('date', Carbon::today()->toDateString());
@@ -672,11 +675,11 @@ class BeatController extends Controller
     // public function assignLeadersOnDuty($companyId, $date, &$usedStudentIds)
     // {
     //     // Check if leaders on duty have already been assigned for the given date
-    //     // $existingLeadersOnDuty = BeatLeaderOnDuty::where('beat_date', $date)
+    //     // $existingLeadersOnDuty = ::where('beat_date', $date)
     //     //     ->where('company_id', $companyId)
     //     //     ->exists();
 
-    //       $existingLeadersOnDuty = BeatLeaderOnDuty::where('beat_date', $date)
+    //       $existingLeadersOnDuty = ::where('beat_date', $date)
     //             ->where('company_id', $companyId)
     //                 ->count();
 
@@ -861,7 +864,7 @@ public function assignLeadersOnDuty($companyId, $date)
             ->flatten()
             ->toArray();
 
-        $assignedLeaderIds = BeatLeaderonDuty::where('beat_date', $date)
+        $assignedLeaderIds = BeatLeaderOnDuty::where('beat_date', $date)
             ->where('company_id', $companyId)
             ->pluck('student_id')
             ->toArray();

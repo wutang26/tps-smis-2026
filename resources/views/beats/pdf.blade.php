@@ -105,12 +105,15 @@
 <body>
     
 <div class="watermark">
-        <img src="{{ asset('resources/assets/images/logo.png') }}" alt="Watermark">
-</div>
+        <!-- <img src="{{ asset('resources/assets/images/logo.png') }}" alt="Watermark"> -->
+        <img src="{{ public_path('assets/images/logo.png') }}" alt="Watermark">
+
+    </div>
     <div class="container" style="margin-top:-60px;">
         <div class="header">
             <div style="text-align: center;">
-                <img src="{{ asset('resources/assets/images/logo.png') }}"  style="height:60 !important; width:50" alt="Police Logoz">
+                <!-- <img src="{{ asset('resources/assets/images/logo.png') }}"  style="height:60 !important; width:50" alt="Police Logoz"> -->
+                <img src="{{ public_path('assets/images/logo.png') }}"  style="height:60 !important; width:50" alt="Police Logoz">
             </div>
 
             @php
@@ -118,8 +121,8 @@
             @endphp
             <!-- <h1><b>TANZANIA POLICE SCHOOL-MOSHI</b></h1> -->
             <h1 style="margin-top:-5px;">RATIBA YA MALINDO  {{ strtoupper($company->description) }}</h1>
-            <!-- <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}}</h2> -->
-            <h2 style="margin-top:-5px;">TAREHE 22/01/2026</h2>
+            <h2 style="margin-top:-5px;">TAREHE {{ $date->format('d/m/Y')}}</h2>
+            <!-- <h2 style="margin-top:-5px;">TAREHE 22/01/2026</h2> -->
              
         </div>
 
@@ -203,8 +206,8 @@
  <br>
 
 <div class="table-container" style="margin-top:-30px;"> 
-    <!-- <center><h1>RATIBA YA DORIA {{ strtoupper($company->description) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TAREHE {{ $date->format('d/m/Y')}}</h1></center> -->
-    <center><h1>RATIBA YA DORIA {{ strtoupper($company->description) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TAREHE 22/01/2026</h1></center>
+    <center><h1>RATIBA YA DORIA {{ strtoupper($company->description) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TAREHE {{ $date->format('d/m/Y')}}</h1></center>
+    <!-- <center><h1>RATIBA YA DORIA {{ strtoupper($company->description) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TAREHE 22/01/2026</h1></center> -->
     <table class="table">
         <thead>
             <tr>
@@ -316,8 +319,8 @@
 
 <div class="page-break"></div>
 
-<!-- <h1>Beats Summary for {{ $date->format('d/m/Y')}}</h1> -->
-<h1>Beats Summary for 22/01/2026</h1>
+<h1>Beats Summary for {{ $date->format('d/m/Y')}}</h1>
+<!-- <h1>Beats Summary for 22/01/2026</h1> -->
     <table>
         <thead>
             <tr>

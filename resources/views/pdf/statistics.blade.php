@@ -18,7 +18,8 @@
 
     <!-- Header -->
     <div class="header">
-        <img src="{{ public_path('logo.png') }}" alt="Police Logo">
+        <!-- <img src="{{ public_path('logo.png') }}" alt="Police Logo"> -->
+         <img src="{{ public_path('assets/images/logo.png') }}">
         <h2>SHULE YA  POLISI TANZANIA -TPS MOSHI</h2>
         <h4>Patient Statistics Report</h4>
         <p><strong>Timeframe:</strong> {{ ucfirst($timeframe) }}</p>
