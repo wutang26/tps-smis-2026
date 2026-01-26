@@ -82,6 +82,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
 
 
+
+
 require __DIR__.'/auth.php';
 
 Auth::routes();
@@ -90,6 +92,8 @@ Route::get('/tps_smis', [HomeController::class, 'index'])->name('home');
 Route::get('/imagick-test', function () {
     return extension_loaded('imagick') ? 'Imagick is working!' : 'Imagick not loaded.';
 });
+
+
 
 
 // Route::get('/', function () {
@@ -180,6 +184,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/beats/pdf/{company}', [BeatController::class, 'generatePDF'])->name('beats.generatePDF');
     Route::post('/generate-transcript', [FinalResultController::class, 'generateTranscript'])->name('final.generateTranscript');
     Route::post('/generate-certificate', [FinalResultController::class, 'generateCertificate'])->name('final.generateCertificate');
+    
+       
+// Route::get('/test-beats', [BeatController::class, 'testGenerateBeats']);
+Route::get('/test-beats', [BeatController::class, 'testGenerateBeats'])->name('beats.test_beats');
+Route::get('/beats/guards/skipped', [BeatController::class, 'skippedStudents'])
+    ->name('beats.guards.skipped');
+
+//Na Test Generate Beats
+
+
+
+
 
     // Route to generate and display the report
     Route::get('/report/generate', [BeatController::class, 'showReport'])->name('report.generate');

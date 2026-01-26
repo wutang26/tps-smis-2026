@@ -514,6 +514,9 @@
                         <li>
                             <a href="{{url('/report/generate')}}">Beat Report</a>
                         </li>
+                        <li>
+                            <a href="{{ route('beats.test_beats') }}">Beat Status</a>
+                        </li>                         
                     </ul>
                 </li>
             @endcan()

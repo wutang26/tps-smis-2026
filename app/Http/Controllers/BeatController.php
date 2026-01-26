@@ -72,7 +72,7 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1, 2, 3, 4, 5, 6, 7])->where('beat_round', '<', 15)->where('beat_status', 1)->where('gender', 'M')->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1, 2, 3, 4, 5, 6, 7, 8, 9])->where('beat_round', '<', 15)->where('beat_status', 1)->where('gender', 'M')->get();
 
        
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
@@ -373,17 +373,28 @@ class BeatController extends Controller
 
 
     //Generate beats
-    public function generateBeats($areas, $studentsByCompany, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
+    public function generateBeats($areas, $studentsByCompany, $currentGroup, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
     {
-        $beats = [];
+//        dd([
+//     'date' => $date,
+//     'currentGroup' => $currentGroup->toArray(),
+//     'groupCount' => count($currentGroup),
+// ]);
+
+    
+         $beats = [];
+         
+        //Define Days to avoid repeting students frequently
+        $minRestDays = 5;
+        $cutoffDate = Carbon::parse($date)->subDays($minRestDays);
 
         // Dynamically determine platoon groups A & B
-        $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
-        $mid = floor($totalPlatoons->count() / 2);
-        $groupA = $totalPlatoons->slice(0, $mid)->values();
-        $groupB = $totalPlatoons->slice($mid)->values();
+        // $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
+        // $mid = floor($totalPlatoons->count() / 2);
+        // $groupA = $totalPlatoons->slice(0, $mid)->values();
+        // $groupB = $totalPlatoons->slice($mid)->values();
 
-        $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+        // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
         // $groupBx = [1, 2, 3, 4, 5, 6, 7];
 
         // Convert array into a Laravel Collection
@@ -416,10 +427,23 @@ class BeatController extends Controller
 
             // Fetch eligible students
             $companyStudents = $studentsByCompany[$company_id] ?? collect();
+
             $companyStudents = $companyStudents
                 ->whereIn('platoon', $currentGroup)
                 ->whereNotIn('id', $usedStudentIds)
                 ->values();
+
+            //Majaribio
+            $companyStudents = $companyStudents
+                ->whereIn('platoon', $currentGroup)
+                ->whereNotIn('id', $usedStudentIds)
+                ->filter(function ($student) use ($cutoffDate) {
+                    return is_null($student->last_beat_date)
+                        || Carbon::parse($student->last_beat_date)->lt($cutoffDate);
+                })
+                ->values();
+
+
             // $selectedStudents = collect();
             // $EligibleFemales =   count($companyStudents->where('gender', 'F'));
             // $EligibleMales =   count($companyStudents->where('gender', 'M'));
@@ -492,7 +516,9 @@ class BeatController extends Controller
 
             // Group students by platoon
             $studentsByPlatoonInGroup = $companyStudents->groupBy('platoon');
+
             $platoonsInGroup = $currentGroup->toArray();
+
             $numPlatoons = count($platoonsInGroup);
 
             if ($numPlatoons > 0 && $requiredStudents > 0) {
@@ -538,9 +564,16 @@ class BeatController extends Controller
                 }
 
                 // Increment beat_round for assigned students
-                Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
+                // Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
+               
+               Student::whereIn('id', $assignedStudentIds)->update([
+                        'last_beat_date' => $date,
+                    ]);
+
+                    Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
+
                 // Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 14]);
-            }
+             }
 
             if (! empty($assignedStudentIds)) {
                 $beats[] = [
@@ -560,6 +593,224 @@ class BeatController extends Controller
 
         return $beats;
     }
+
+    
+
+    //Test BEAT  Assigned and Remaining Or Skipped Students 
+    public function testGenerateBeats(Request $request)
+    {
+        // Selected date or today
+        $date = $request->date 
+            ? Carbon::parse($request->date)->format('Y-m-d')
+            : now()->format('Y-m-d');
+
+            $beatType = 'guards';
+            $usedStudentIds = [];
+            $minRestDays = 5;
+
+        // Areas
+        $areas = ($beatType === 'guards') ? GuardArea::all() : PatrolArea::all();
+
+        $areas = $areas->map(fn($area) => [
+            'area' => $area,
+            'start_at' => $area->start_at ?? '06:00',
+            'end_at' => $area->end_at ?? '12:00',
+        ])->toArray();
+
+        // Fetch Students
+         $students = Student::all();
+        // $students = Student::where('session_programme_id', 10)->get();
+        
+
+        $studentsByCompany = $students->groupBy('company_id');
+
+        $studentsByPlatoon = $students->groupBy('platoon');
+
+        // Platoon grouping based on selected date
+        $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
+
+        $mid = floor($totalPlatoons->count() / 2);
+        $groupA = $totalPlatoons->slice(0, $mid)->values();
+        $groupB = $totalPlatoons->slice($mid)->values();
+
+        $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+         
+        // dd($groupA, $groupB);
+
+        //         dd([
+        //     'date' => $date,
+        //     'day' => Carbon::parse($date)->day,
+        //     'currentGroup' => $currentGroup->toArray(),
+        // ]);
+
+        // Generate beats FOR THAT DATE
+        $beats = $this->generateBeats(
+            $areas,
+            $studentsByCompany,
+            $currentGroup,
+            $studentsByPlatoon,
+            $beatType,
+            $date,
+            $usedStudentIds
+        );
+
+        // Assigned students FOR THAT DATE
+        $assignedStudents = Student::whereIn('id', $usedStudentIds)
+            ->get([
+                'id','first_name','last_name',
+                'company_id','platoon',
+                'beat_round','last_beat_date'
+            ]);
+
+        // Ineligible / skipped logic
+        $cutoffDate = Carbon::parse($date)->subDays($minRestDays);
+
+        $ineligibleStudents = $students
+        ->whereNotIn('id', $usedStudentIds)
+        ->map(function ($student) use ($cutoffDate, $currentGroup, $minRestDays, $date) {
+
+        $restDaysRemaining = 0;
+        $nextEligibleDate = null;
+        $eligibleTomorrow = false;
+        $reason = '';
+
+        
+         //HARD STATES FIRST (override everything)
+         
+        if ($student->beat_status == 4) {
+            $reason = 'Safari';
+
+        } elseif ($student->beat_status == 0 && $student->beat_round == 0) {
+            $reason = 'Kitengo';
+
+        
+         //REST CHECK
+        } elseif ($student->last_beat_date &&
+            Carbon::parse($student->last_beat_date)->gte($cutoffDate)) {
+
+            $daysPassed = Carbon::parse($student->last_beat_date)->diffInDays($date);
+            $restDaysRemaining = max(0, $minRestDays - $daysPassed);
+
+            $nextEligibleDate = Carbon::parse($student->last_beat_date)
+                ->addDays($minRestDays)
+                ->format('Y-m-d');
+
+            if ($restDaysRemaining > 0) {
+                $reason = "On rest ({$restDaysRemaining} day(s) left)";
+            } else {
+                $reason = "Eligible today";
+            }
+
+            if ($nextEligibleDate === Carbon::parse($date)->addDay()->format('Y-m-d')) {
+                $eligibleTomorrow = true;
+            }
+
+        /**
+         *  PLATOON ROTATION
+         */
+        } elseif (!in_array($student->platoon, $currentGroup->toArray())) {
+            $reason = 'Platoon not scheduled today';
+
+        } else {
+            $reason = 'Not selected';
+        }
+
+        $student->reason_skipped = $reason;
+        $student->rest_days_remaining = $restDaysRemaining;
+        $student->next_eligible_date = $nextEligibleDate;
+        $student->eligible_tomorrow = $eligibleTomorrow;
+
+        return $student;
+    })
+    ->sortByDesc('eligible_tomorrow')
+    ->values();
+
+
+        return view('beats.test-beat', compact(
+            'beats',
+            'assignedStudents',
+            'ineligibleStudents',
+            'date'
+        ));
+    }
+
+
+    //Display not Remaining and skipped students
+
+//Go to another page 
+public function skippedStudents(Request $request)
+{
+    $date = $request->date 
+        ? Carbon::parse($request->date)->format('Y-m-d')
+        : now()->format('Y-m-d');
+
+    $minRestDays = 5;
+
+    $students = Student::where('session_programme_id', 10)->get();
+
+    $studentsByPlatoon = $students->groupBy('platoon');
+
+    // Platoon grouping
+    $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
+    $mid = floor($totalPlatoons->count() / 2);
+    $groupA = $totalPlatoons->slice(0, $mid)->values();
+    $groupB = $totalPlatoons->slice($mid)->values();
+
+    $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
+
+    $cutoffDate = Carbon::parse($date)->subDays($minRestDays);
+
+    $ineligibleStudents = $students->map(function ($student) use ($cutoffDate, $currentGroup, $minRestDays, $date) {
+
+        $restDaysRemaining = 0;
+        $nextEligibleDate = null;
+        $eligibleTomorrow = false;
+        $reason = '';
+
+        if ($student->beat_status == 4) {
+            $reason = 'Safari';
+
+        } elseif ($student->beat_status == 0 && $student->beat_round == 0) {
+            $reason = 'Kitengo';
+
+        } elseif ($student->last_beat_date &&
+            Carbon::parse($student->last_beat_date)->gte($cutoffDate)) {
+
+            $daysPassed = Carbon::parse($student->last_beat_date)->diffInDays($date);
+            $restDaysRemaining = max(0, $minRestDays - $daysPassed);
+
+            $nextEligibleDate = Carbon::parse($student->last_beat_date)
+                ->addDays($minRestDays)
+                ->format('Y-m-d');
+
+            if ($nextEligibleDate === Carbon::parse($date)->addDay()->format('Y-m-d')) {
+                $eligibleTomorrow = true;
+            }
+
+            $reason = "On rest";
+
+        } elseif (!in_array($student->platoon, $currentGroup->toArray())) {
+            $reason = 'Platoon not scheduled today';
+
+        } else {
+            $reason = 'Not selected';
+        }
+
+        $student->reason_skipped = $reason;
+        $student->rest_days_remaining = $restDaysRemaining;
+        $student->next_eligible_date = $nextEligibleDate;
+        $student->eligible_tomorrow = $eligibleTomorrow;
+
+        return $student;
+    });
+
+    return view('beats.skipped-students', compact(
+        'ineligibleStudents',
+        'date'
+    ));
+}
+
+
 
     // Fill Beats
     public function fillBeats(Request $request)
@@ -751,7 +1002,7 @@ public function assignLeadersOnDuty($companyId, $date)
 
         // Count already assigned leaders
         $existingCount = BeatLeaderOnDuty::where('company_id', $companyId)
-            ->where('beat_date', $date)
+        ->where('beat_date', $date)
             ->count();
 
         if ($existingCount >= 2) {
@@ -1007,6 +1258,7 @@ public function assignLeadersOnDuty($companyId, $date)
         return $pdf->download('history.pdf');
     }
 
+
     public function showReport2(Request $request)
     {
         $startDate = $request->input('start_date', null);
@@ -1018,6 +1270,7 @@ public function assignLeadersOnDuty($companyId, $date)
         return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
     }
 
+
     private function beatHistory($company)
     {
         // $companies = Company::all();
@@ -1025,6 +1278,7 @@ public function assignLeadersOnDuty($companyId, $date)
         // foreach($companies as $company){
         $students = $company->students->where('session_programme_id', 10);
         $totalStudents = count($students);
+        
         $totalEligibleStudents = count($students->whereIn('beat_status', [1, 2, 3]));
         $totalIneligibleStudents = count($students->whereNotIn('beat_status', [1, 2, 3]));
         // $eligibleStudentsPercent = round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2);
@@ -1130,6 +1384,7 @@ public function assignLeadersOnDuty($companyId, $date)
         return $pdf->download('beat_report.pdf');
     }
 
+    // Generate Beat Report
     private function generateBeatReport($companyId = null, $startDate = null, $endDate = null, $dateFilter = null)
     {
         $companies = is_null($companyId) ? Company::all() : Company::where('id', $companyId)->get();
@@ -1178,6 +1433,7 @@ public function assignLeadersOnDuty($companyId, $date)
             )
             ->groupBy('company_id')
             ->get();
+
         // Categorize ineligible students
         $vitengoCategories = [];
         $emergencyCategories = [];
@@ -1309,6 +1565,7 @@ public function assignLeadersOnDuty($companyId, $date)
 
         return redirect()->route('beats.index')->with('success', 'Beat deleted successfully!');
     }
+
 
     public function beatReserves($companyId, $date)
     {
