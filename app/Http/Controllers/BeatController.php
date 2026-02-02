@@ -72,12 +72,13 @@ class BeatController extends Controller
         $beat = Beat::find($beat_id);
         $beats = Beat::where('id', $beat_id)->get();
         $stud = Student::whereIn('id', json_decode($beat->student_ids))->get();
-        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1, 2, 3, 4, 5, 6, 7, 8, 9])->where('beat_round', '<', 15)->where('beat_status', 1)->where('gender', 'M')->get();
+        $eligible_students = Student::where('company_id', 2)->whereIn('platoon', [1, 2, 3, 4, 5, 6, 7,8,9])->where('beat_round', '<', 15)->where('beat_status', 1)->where('gender', 'M')->get();
 
        
         return view('beats.edit', compact('beat', 'beats', 'eligible_students', 'stud'));
     }
 
+    //Exchange Beats Functions
     public function createExchange(Beat $beat)
     {
         if ($beat->guardArea) {
@@ -315,6 +316,11 @@ class BeatController extends Controller
         ->whereDate('beat_date', $date)
         ->get();
 
+        $leader = BeatLeaderOnDuty::with('student')
+    ->where('company_id', $companyId)
+    ->whereDate('beat_date', $date)
+    ->get();
+
 
     //  Build summary (unchanged)
     $summary = [];
@@ -371,516 +377,604 @@ class BeatController extends Controller
         }
     }
 
+    // public function generateBeats($areas, $studentsByCompany, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
+    // {
+    //         // Allow script to run longer for large data
+    //     ini_set('max_execution_time', 300); // 300 seconds = 5 minutes
+    //     set_time_limit(300);
+        
+    //     $beats = [];
 
-    //Generate beats
-    public function generateBeats($areas, $studentsByCompany, $currentGroup, $studentsByPlatoon, $beatType, $date, &$usedStudentIds)
+    //     // // Dynamically determine platoon groups for two groups A & B
+    //         // $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
+
+    //         // $mid = floor($totalPlatoons->count() / 2);
+    //         // $groupA = $totalPlatoons->slice(0, $mid)->values();
+    //         // $groupB = $totalPlatoons->slice($mid)->values();
+
+    //         // $currentGroup = Carbon::parse($date)->day % 2 === 1
+    //         //     ? $groupA
+    //         //     : $groupB;
+
+
+    //     // $groupBx = [1, 2, 3, 4, 5, 6, 7];
+
+    //     // Convert array into a Laravel Collection
+    //     // $currentGroup = collect($groupBx);
+    //     // dd($currentGroup);
+
+    //     // Fetch guard and patrol areas with proper time filters
+    //     // $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
+    //     // $_patrolAreas = $this->filterAreasByTimeExceptions(PatrolArea::all());
+    //     // $number_of_guards = 0;
+    //     /*foreach ($_guardAreas as $_guardArea) {
+    //         if ($company->id == $_guardArea['area']['company_id']) {
+    //             $number_of_guards += $_guardArea['area']['number_of_guards'];
+    //         }
+    //     }
+
+    //     foreach ($_patrolAreas as $_patrolArea) {
+    //         if ($company->id == $_patrolArea['area']['company_id']) {
+    //             $number_of_guards += $_patrolArea['area']['number_of_guards'];
+    //         }
+    //     }*/
+
+    //     foreach ($areas as $areaData) {
+    //         $area = $areaData['area'];
+    //         $startAt = $areaData['start_at'];
+    //         $endAt = $areaData['end_at'];
+    //         $company_id = $area->company_id;
+    //         $requiredStudents = $area->number_of_guards;
+    //         $assignedStudentIds = [];
+
+    //         // Fetch eligible students
+    //         $companyStudents = $studentsByCompany[$company_id] ?? collect();
+
+    //         $companyStudents = $companyStudents
+    //             ->whereIn('platoon', $currentGroup)
+    //             ->whereNotIn('id', $usedStudentIds) 
+    //             ->sortBy(fn ($s) => $s->last_assigned_at ?? now()->subYears(10))
+    //             ->values();
+                
+    //         // $selectedStudents = collect();
+    //         // $EligibleFemales =   count($companyStudents->where('gender', 'F'));
+    //         // $EligibleMales =   count($companyStudents->where('gender', 'M'));
+    //         // $EligibleFemalesPercentage =  $EligibleFemales/($EligibleFemales+$EligibleMales);
+    //         // $platoonNoFemales = ceil((137 *$EligibleFemalesPercentage)/7);
+    //         // $platoonNoMales = floor((137 *(1-$EligibleFemalesPercentage))/7);
+
+    //         // $total =($platoonNoFemales+ $platoonNoMales) *7;
+    //         // foreach ($currentGroup as $platoon) {
+    //         //     $platoonStudents = $companyStudents->where('platoon', $platoon);
+    //         //     $females = $platoonStudents->where('gender', 'F')->take($platoonNoFemales);
+    //         //     $males = $platoonStudents->where('gender', 'M')->take($platoonNoMales);
+
+    //         //     $selectedStudents = $selectedStudents->merge($females)->merge($males);
+    //         // }
+
+    //         // Apply Gender Restrictions
+    //         if (! empty($area->beat_exception_ids)) {
+    //             $exceptions = json_decode($area->beat_exception_ids, true);
+    //             if (in_array(1, $exceptions)) {
+    //                 $companyStudents = $companyStudents->where('gender', 'F')->values();
+    //             } elseif (in_array(2, $exceptions)) {
+    //                 $companyStudents = $companyStudents->where('gender', 'M')->values();
+    //             } elseif (in_array(3, $exceptions)) {
+    //                 $femaleStudents = $companyStudents->where('gender', 'F')->values();
+    //                 $maleStudents = $companyStudents->where('gender', 'M')->values();
+
+    //                 // Calculate the count for each gender
+    //                 $femaleCount = $femaleStudents->count();
+    //                 $maleCount = $maleStudents->count();
+
+    //                 // Ensure the number of female students is either greater than or less than the number of male students
+    //                 if ($femaleCount !== $maleCount) {
+    //                     // Combine both collections without adjusting
+    //                     $companyStudents = $femaleStudents->merge($maleStudents)->values();
+    //                 } else {
+    //                     // Adjust to ensure femaleCount is not equal to maleCount
+    //                     $femaleStudents = $femaleStudents->take($femaleCount + 1);
+    //                     $companyStudents = $maleStudents->merge($femaleStudents)->values();
+    //                 }
+    //             }
+    //         } else {
+    //             // Prioritize females during the day and males at night but allow both if necessary
+    //             if ($startAt === '06:00' || $startAt === '12:00') {
+    //                 $preferredStudents = $companyStudents->where('gender', 'F');
+    //             } else {
+    //                 $preferredStudents = $companyStudents->where('gender', 'M');
+    //             }
+
+    //             // Prioritize muislims who fasted ... during morning and mid night
+    //             // if ($startAt === '06:00' || $startAt === '00:00') {
+    //             //     $preferredStudents = $companyStudents->where('fast_status', 1);
+    //             // } else {
+    //             //     $preferredStudents = $companyStudents->where('fast_status', 0);
+    //             // }
+
+    //             if ($preferredStudents->isNotEmpty()) {
+    //                 $companyStudents = $preferredStudents->values();
+    //             }
+    //         }
+
+    //         // Sort students by beat_round (ascending) and id (ascending)
+    //         $companyStudents = $companyStudents->sort(function ($a, $b) {
+    //             if ($a->beat_round == $b->beat_round) {
+    //                 return $a->id <=> $b->id;
+    //             }
+    //             return $a->beat_round <=> $b->beat_round;
+    //         })->values();
+
+    //         // Group students by platoon
+    //         $studentsByPlatoonInGroup = $companyStudents->groupBy('platoon');
+    //         $platoonsInGroup = $currentGroup->toArray();
+    //         $numPlatoons = count($platoonsInGroup);
+
+    //         if ($numPlatoons > 0 && $requiredStudents > 0) {
+    //             // Calculate students per platoon
+    //             $studentsPerPlatoon = intdiv($requiredStudents, $numPlatoons);
+    //             $remainingStudents = $requiredStudents % $numPlatoons;
+
+    //             // dd($platoonsInGroup);
+    //             // Shuffle platoons for fair distribution of remaining students
+    //             // shuffle($platoonsInGroup);
+
+    //             // foreach ($platoonsInGroup as $platoon) {
+    //             //     $studentsNeeded = $studentsPerPlatoon;
+    //             //     if ($remainingStudents > 0) {
+    //             //         $studentsNeeded += 1;
+    //             //         $remainingStudents -= 1;
+    //             //     }
+
+    //             //     $platoonStudents = $studentsByPlatoonInGroup[$platoon] ?? collect();
+    //             //     $platoonStudents = $platoonStudents->whereNotIn('id', $usedStudentIds)->values();
+    //             //     $availableStudents = $platoonStudents->count();
+
+    //             //     // Assign as many students as possible, up to the number needed
+    //             //     $studentsToAssign = min($studentsNeeded, $availableStudents);
+    //             //     $selectedStudents = $platoonStudents->take($studentsToAssign)->pluck('id')->toArray();
+
+    //             //     $assignedStudentIds = array_merge($assignedStudentIds, $selectedStudents);
+    //             //     $usedStudentIds = array_merge($usedStudentIds, $selectedStudents);
+    //             // }
+
+    //             //Shuffle Problem Fixed
+    //                 // Shuffle platoons for fair distribution
+    //                 shuffle($platoonsInGroup);
+
+    //                 foreach ($platoonsInGroup as $platoon) {
+    //                     $studentsNeeded = $studentsPerPlatoon;
+
+    //                     if ($remainingStudents > 0) {
+    //                         $studentsNeeded++;
+    //                         $remainingStudents--;
+    //                     }
+
+    //                     $platoonStudents = $studentsByPlatoonInGroup[$platoon] ?? collect();
+
+    //                     // Remove already used students
+    //                     $platoonStudents = $platoonStudents
+    //                         ->whereNotIn('id', $usedStudentIds)
+    //                         ->shuffle() // SHUFFLE STUDENTS TOO
+    //                         ->values();
+
+    //                     $availableStudents = $platoonStudents->count();
+
+    //                     $studentsToAssign = min($studentsNeeded, $availableStudents);
+
+    //                     $selectedStudents = $platoonStudents
+    //                         ->take($studentsToAssign)
+    //                         ->pluck('id')
+    //                         ->toArray();
+
+    //                     $assignedStudentIds = array_merge($assignedStudentIds, $selectedStudents);
+    //                     $usedStudentIds     = array_merge($usedStudentIds, $selectedStudents);
+    //                 }
+                      
+    //                   //  To Keep A system Memory of Last Assigned Students
+    //                 Student::whereIn('id', $assignedStudentIds)
+    //                     ->update(['last_assigned_at' => now()]);
+
+    //             //End of Shuffle fixed 
+
+    //             // Fill any remaining slots with available students
+    //             $unfilledSpots = $requiredStudents - count($assignedStudentIds);
+    //             if ($unfilledSpots > 0) {
+    //                 $remainingStudents = $companyStudents->whereNotIn('id', $usedStudentIds)->pluck('id')->toArray();
+    //                 $additionalStudents = array_slice($remainingStudents, 0, $unfilledSpots);
+    //                 $assignedStudentIds = array_merge($assignedStudentIds, $additionalStudents);
+    //                 $usedStudentIds = array_merge($usedStudentIds, $additionalStudents);
+    //             }
+
+    //             // Increment beat_round for assigned students
+    //             Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
+    //             // Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 14]);
+    //         }
+
+    //         if (! empty($assignedStudentIds)) {
+    //             $beats[] = [
+    //                 'beatType_id' => ($beatType === 'guards') ? 1 : 2,
+    //                 'guardArea_id' => ($beatType === 'guards') ? $area->id : null,
+    //                 'patrolArea_id' => ($beatType === 'patrols') ? $area->id : null,
+    //                 'student_ids' => json_encode($assignedStudentIds),
+    //                 'date' => $date,
+    //                 'start_at' => $startAt,
+    //                 'end_at' => $endAt,
+    //                 'status' => true,
+    //                 'created_at' => Carbon::now(),
+    //                 'updated_at' => Carbon::now(),
+    //             ];
+    //         }
+    //     }
+
+    //     return $beats;
+    // }
+
+    public function generateBeats($areas,$studentsByCompany,$studentsByPlatoon,$beatType,$date,&$usedStudentIds) 
     {
-//        dd([
-//     'date' => $date,
-//     'currentGroup' => $currentGroup->toArray(),
-//     'groupCount' => count($currentGroup),
-// ]);
+         // Allow script to run longer for large data
+    ini_set('max_execution_time', 300);
+    set_time_limit(300);
 
-    
-         $beats = [];
-         
-        //Define Days to avoid repeting students frequently
-        $minRestDays = 5;
-        $cutoffDate = Carbon::parse($date)->subDays($minRestDays);
+    $beats = [];
 
-        // Dynamically determine platoon groups A & B
-        // $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
-        // $mid = floor($totalPlatoons->count() / 2);
-        // $groupA = $totalPlatoons->slice(0, $mid)->values();
-        // $groupB = $totalPlatoons->slice($mid)->values();
+    $cooldownDate = Carbon::parse($date)->subDays(4); //rest period of 4 days
 
-        // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-        // $groupBx = [1, 2, 3, 4, 5, 6, 7];
+    // Single platoon group system
+    // $currentGroup = $studentsByPlatoon->keys()->sort()->values();
+
+    $groupBx = [10, 11, 12, 13, 14, 15, 16,17,18];
 
         // Convert array into a Laravel Collection
-        // $currentGroup = collect($groupBx);
-        // dd($currentGroup);
-
-        // Fetch guard and patrol areas with proper time filters
-        // $_guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
-        // $_patrolAreas = $this->filterAreasByTimeExceptions(PatrolArea::all());
-        // $number_of_guards = 0;
-        /*foreach ($_guardAreas as $_guardArea) {
-            if ($company->id == $_guardArea['area']['company_id']) {
-                $number_of_guards += $_guardArea['area']['number_of_guards'];
-            }
-        }
-
-        foreach ($_patrolAreas as $_patrolArea) {
-            if ($company->id == $_patrolArea['area']['company_id']) {
-                $number_of_guards += $_patrolArea['area']['number_of_guards'];
-            }
-        }*/
-
-        foreach ($areas as $areaData) {
-            $area = $areaData['area'];
-            $startAt = $areaData['start_at'];
-            $endAt = $areaData['end_at'];
-            $company_id = $area->company_id;
-            $requiredStudents = $area->number_of_guards;
-            $assignedStudentIds = [];
-
-            // Fetch eligible students
-            $companyStudents = $studentsByCompany[$company_id] ?? collect();
-
-            $companyStudents = $companyStudents
-                ->whereIn('platoon', $currentGroup)
-                ->whereNotIn('id', $usedStudentIds)
-                ->values();
-
-            //Majaribio
-            $companyStudents = $companyStudents
-                ->whereIn('platoon', $currentGroup)
-                ->whereNotIn('id', $usedStudentIds)
-                ->filter(function ($student) use ($cutoffDate) {
-                    return is_null($student->last_beat_date)
-                        || Carbon::parse($student->last_beat_date)->lt($cutoffDate);
-                })
-                ->values();
-
-
-            // $selectedStudents = collect();
-            // $EligibleFemales =   count($companyStudents->where('gender', 'F'));
-            // $EligibleMales =   count($companyStudents->where('gender', 'M'));
-            // $EligibleFemalesPercentage =  $EligibleFemales/($EligibleFemales+$EligibleMales);
-            // $platoonNoFemales = ceil((137 *$EligibleFemalesPercentage)/7);
-            // $platoonNoMales = floor((137 *(1-$EligibleFemalesPercentage))/7);
-
-            // $total =($platoonNoFemales+ $platoonNoMales) *7;
-            // foreach ($currentGroup as $platoon) {
-            //     $platoonStudents = $companyStudents->where('platoon', $platoon);
-            //     $females = $platoonStudents->where('gender', 'F')->take($platoonNoFemales);
-            //     $males = $platoonStudents->where('gender', 'M')->take($platoonNoMales);
-
-            //     $selectedStudents = $selectedStudents->merge($females)->merge($males);
-            // }
-
-            // Apply Gender Restrictions
-            if (! empty($area->beat_exception_ids)) {
-                $exceptions = json_decode($area->beat_exception_ids, true);
-                if (in_array(1, $exceptions)) {
-                    $companyStudents = $companyStudents->where('gender', 'F')->values();
-                } elseif (in_array(2, $exceptions)) {
-                    $companyStudents = $companyStudents->where('gender', 'M')->values();
-                } elseif (in_array(3, $exceptions)) {
-                    $femaleStudents = $companyStudents->where('gender', 'F')->values();
-                    $maleStudents = $companyStudents->where('gender', 'M')->values();
-
-                    // Calculate the count for each gender
-                    $femaleCount = $femaleStudents->count();
-                    $maleCount = $maleStudents->count();
-
-                    // Ensure the number of female students is either greater than or less than the number of male students
-                    if ($femaleCount !== $maleCount) {
-                        // Combine both collections without adjusting
-                        $companyStudents = $femaleStudents->merge($maleStudents)->values();
-                    } else {
-                        // Adjust to ensure femaleCount is not equal to maleCount
-                        $femaleStudents = $femaleStudents->take($femaleCount + 1);
-                        $companyStudents = $maleStudents->merge($femaleStudents)->values();
-                    }
-                }
-            } else {
-                // Prioritize females during the day and males at night but allow both if necessary
-                if ($startAt === '06:00' || $startAt === '12:00') {
-                    $preferredStudents = $companyStudents->where('gender', 'F');
-                } else {
-                    $preferredStudents = $companyStudents->where('gender', 'M');
-                }
-
-                // Prioritize muislims who fasted ... during morning and mid night
-                // if ($startAt === '06:00' || $startAt === '00:00') {
-                //     $preferredStudents = $companyStudents->where('fast_status', 1);
-                // } else {
-                //     $preferredStudents = $companyStudents->where('fast_status', 0);
-                // }
-
-                if ($preferredStudents->isNotEmpty()) {
-                    $companyStudents = $preferredStudents->values();
-                }
-            }
-
-            // Sort students by beat_round (ascending) and id (ascending)
-            $companyStudents = $companyStudents->sort(function ($a, $b) {
-                if ($a->beat_round == $b->beat_round) {
-                    return $a->id <=> $b->id;
-                }
-
-                return $a->beat_round <=> $b->beat_round;
-            })->values();
-
-            // Group students by platoon
-            $studentsByPlatoonInGroup = $companyStudents->groupBy('platoon');
-
-            $platoonsInGroup = $currentGroup->toArray();
-
-            $numPlatoons = count($platoonsInGroup);
-
-            if ($numPlatoons > 0 && $requiredStudents > 0) {
-                // Calculate students per platoon
-                $studentsPerPlatoon = intdiv($requiredStudents, $numPlatoons);
-                $remainingStudents = $requiredStudents % $numPlatoons;
-
-                // dd($platoonsInGroup);
-                // Shuffle platoons for fair distribution of remaining students
-                shuffle($platoonsInGroup);
-
-                foreach ($platoonsInGroup as $platoon) {
-                    $studentsNeeded = $studentsPerPlatoon;
-                    if ($remainingStudents > 0) {
-                        $studentsNeeded += 1;
-                        $remainingStudents -= 1;
-                    }
-
-                    $platoonStudents = $studentsByPlatoonInGroup[$platoon] ?? collect();
-                    $platoonStudents = $platoonStudents->whereNotIn('id', $usedStudentIds)->values();
-                    $availableStudents = $platoonStudents->count();
-
-                    // Assign as many students as possible, up to the number needed
-                    $studentsToAssign = min($studentsNeeded, $availableStudents);
-                    $selectedStudents = $platoonStudents->take($studentsToAssign)->pluck('id')->toArray();
-
-                    // $assignedStudentIds = array_merge($assignedStudentIds, $selectedStudents);
-                    // $usedStudentIds = array_merge($usedStudentIds, $selectedStudents);
-                  
-                    // Merge selected students into both assigned and used arrays, remove duplicates, reset keys
-                    $assignedStudentIds = array_values(array_unique(array_merge($assignedStudentIds, $selectedStudents)));
-                    $usedStudentIds     = array_values(array_unique(array_merge($usedStudentIds, $selectedStudents)));
-
-                                }
-
-                // Fill any remaining slots with available students
-                $unfilledSpots = $requiredStudents - count($assignedStudentIds);
-                if ($unfilledSpots > 0) {
-                    $remainingStudents = $companyStudents->whereNotIn('id', $usedStudentIds)->pluck('id')->toArray();
-                    $additionalStudents = array_slice($remainingStudents, 0, $unfilledSpots);
-                    $assignedStudentIds = array_merge($assignedStudentIds, $additionalStudents);
-                    $usedStudentIds = array_merge($usedStudentIds, $additionalStudents);
-                }
-
-                // Increment beat_round for assigned students
-                // Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
-               
-               Student::whereIn('id', $assignedStudentIds)->update([
-                        'last_beat_date' => $date,
-                    ]);
-
-                    Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
-
-                // Student::whereIn('id', $assignedStudentIds)->update(['beat_status' => 14]);
-             }
-
-            if (! empty($assignedStudentIds)) {
-                $beats[] = [
-                    'beatType_id' => ($beatType === 'guards') ? 1 : 2,
-                    'guardArea_id' => ($beatType === 'guards') ? $area->id : null,
-                    'patrolArea_id' => ($beatType === 'patrols') ? $area->id : null,
-                    'student_ids' => json_encode($assignedStudentIds),
-                    'date' => $date,
-                    'start_at' => $startAt,
-                    'end_at' => $endAt,
-                    'status' => true,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            }
-        }
-
-        return $beats;
-    }
-
-    
-
-    //Test BEAT  Assigned and Remaining Or Skipped Students 
-    public function testGenerateBeats(Request $request)
-    {
-        // Selected date or today
-        $date = $request->date 
-            ? Carbon::parse($request->date)->format('Y-m-d')
-            : now()->format('Y-m-d');
-
-            $beatType = 'guards';
-            $usedStudentIds = [];
-            $minRestDays = 5;
-
-        // Areas
-        $areas = ($beatType === 'guards') ? GuardArea::all() : PatrolArea::all();
-
-        $areas = $areas->map(fn($area) => [
-            'area' => $area,
-            'start_at' => $area->start_at ?? '06:00',
-            'end_at' => $area->end_at ?? '12:00',
-        ])->toArray();
-
-        // Fetch Students
-         $students = Student::all();
-        // $students = Student::where('session_programme_id', 10)->get();
-        
-
-        $studentsByCompany = $students->groupBy('company_id');
-
-        $studentsByPlatoon = $students->groupBy('platoon');
-
-        // Platoon grouping based on selected date
-        $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
-
-        $mid = floor($totalPlatoons->count() / 2);
-        $groupA = $totalPlatoons->slice(0, $mid)->values();
-        $groupB = $totalPlatoons->slice($mid)->values();
-
-        $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-         
-        // dd($groupA, $groupB);
-
-        //         dd([
-        //     'date' => $date,
-        //     'day' => Carbon::parse($date)->day,
-        //     'currentGroup' => $currentGroup->toArray(),
-        // ]);
-
-        // Generate beats FOR THAT DATE
-        $beats = $this->generateBeats(
-            $areas,
-            $studentsByCompany,
-            $currentGroup,
-            $studentsByPlatoon,
-            $beatType,
-            $date,
-            $usedStudentIds
-        );
-
-        // Assigned students FOR THAT DATE
-        $assignedStudents = Student::whereIn('id', $usedStudentIds)
-            ->get([
-                'id','first_name','last_name',
-                'company_id','platoon',
-                'beat_round','last_beat_date'
-            ]);
-
-        // Ineligible / skipped logic
-        $cutoffDate = Carbon::parse($date)->subDays($minRestDays);
-
-        $ineligibleStudents = $students
-        ->whereNotIn('id', $usedStudentIds)
-        ->map(function ($student) use ($cutoffDate, $currentGroup, $minRestDays, $date) {
-
-        $restDaysRemaining = 0;
-        $nextEligibleDate = null;
-        $eligibleTomorrow = false;
-        $reason = '';
-
-        
-         //HARD STATES FIRST (override everything)
-         
-        if ($student->beat_status == 4) {
-            $reason = 'Safari';
-
-        } elseif ($student->beat_status == 0 && $student->beat_round == 0) {
-            $reason = 'Kitengo';
-
-        
-         //REST CHECK
-        } elseif ($student->last_beat_date &&
-            Carbon::parse($student->last_beat_date)->gte($cutoffDate)) {
-
-            $daysPassed = Carbon::parse($student->last_beat_date)->diffInDays($date);
-            $restDaysRemaining = max(0, $minRestDays - $daysPassed);
-
-            $nextEligibleDate = Carbon::parse($student->last_beat_date)
-                ->addDays($minRestDays)
-                ->format('Y-m-d');
-
-            if ($restDaysRemaining > 0) {
-                $reason = "On rest ({$restDaysRemaining} day(s) left)";
-            } else {
-                $reason = "Eligible today";
-            }
-
-            if ($nextEligibleDate === Carbon::parse($date)->addDay()->format('Y-m-d')) {
-                $eligibleTomorrow = true;
-            }
-
-        /**
-         *  PLATOON ROTATION
-         */
-        } elseif (!in_array($student->platoon, $currentGroup->toArray())) {
-            $reason = 'Platoon not scheduled today';
-
-        } else {
-            $reason = 'Not selected';
-        }
-
-        $student->reason_skipped = $reason;
-        $student->rest_days_remaining = $restDaysRemaining;
-        $student->next_eligible_date = $nextEligibleDate;
-        $student->eligible_tomorrow = $eligibleTomorrow;
-
-        return $student;
-    })
-    ->sortByDesc('eligible_tomorrow')
-    ->values();
-
-
-        return view('beats.test-beat', compact(
-            'beats',
-            'assignedStudents',
-            'ineligibleStudents',
-            'date'
-        ));
-    }
-
-
-    //Display not Remaining and skipped students
-
-//Go to another page 
-public function skippedStudents(Request $request)
-{
-    $date = $request->date 
-        ? Carbon::parse($request->date)->format('Y-m-d')
-        : now()->format('Y-m-d');
-
-    $minRestDays = 5;
-
-    $students = Student::where('session_programme_id', 10)->get();
-
-    $studentsByPlatoon = $students->groupBy('platoon');
-
-    // Platoon grouping
-    $totalPlatoons = $studentsByPlatoon->keys()->sort()->values();
-    $mid = floor($totalPlatoons->count() / 2);
-    $groupA = $totalPlatoons->slice(0, $mid)->values();
-    $groupB = $totalPlatoons->slice($mid)->values();
-
-    $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-
-    $cutoffDate = Carbon::parse($date)->subDays($minRestDays);
-
-    $ineligibleStudents = $students->map(function ($student) use ($cutoffDate, $currentGroup, $minRestDays, $date) {
-
-        $restDaysRemaining = 0;
-        $nextEligibleDate = null;
-        $eligibleTomorrow = false;
-        $reason = '';
-
-        if ($student->beat_status == 4) {
-            $reason = 'Safari';
-
-        } elseif ($student->beat_status == 0 && $student->beat_round == 0) {
-            $reason = 'Kitengo';
-
-        } elseif ($student->last_beat_date &&
-            Carbon::parse($student->last_beat_date)->gte($cutoffDate)) {
-
-            $daysPassed = Carbon::parse($student->last_beat_date)->diffInDays($date);
-            $restDaysRemaining = max(0, $minRestDays - $daysPassed);
-
-            $nextEligibleDate = Carbon::parse($student->last_beat_date)
-                ->addDays($minRestDays)
-                ->format('Y-m-d');
-
-            if ($nextEligibleDate === Carbon::parse($date)->addDay()->format('Y-m-d')) {
-                $eligibleTomorrow = true;
-            }
-
-            $reason = "On rest";
-
-        } elseif (!in_array($student->platoon, $currentGroup->toArray())) {
-            $reason = 'Platoon not scheduled today';
-
-        } else {
-            $reason = 'Not selected';
-        }
-
-        $student->reason_skipped = $reason;
-        $student->rest_days_remaining = $restDaysRemaining;
-        $student->next_eligible_date = $nextEligibleDate;
-        $student->eligible_tomorrow = $eligibleTomorrow;
-
-        return $student;
-    });
-
-    return view('beats.skipped-students', compact(
-        'ineligibleStudents',
-        'date'
-    ));
+    $currentGroup = collect($groupBx);
+
+    foreach ($areas as $areaData) {
+
+        $area              = $areaData['area'];
+        $startAt           = $areaData['start_at'];
+        $endAt             = $areaData['end_at'];
+        $company_id        = $area->company_id;
+        $requiredStudents  = $area->number_of_guards;
+        $assignedStudentIds = [];
+
+        /** ----------------------------------------
+         * BASE ELIGIBLE STUDENTS (WITH 4-DAY REST)
+         * ---------------------------------------- */
+        $baseStudents = ($studentsByCompany[$company_id] ?? collect())
+            ->whereIn('platoon', $currentGroup)
+            ->whereNotIn('id', $usedStudentIds);
+
+        $companyStudents = $baseStudents
+            ->filter(function ($s) use ($cooldownDate) {
+                return is_null($s->last_assigned_at)
+                    || Carbon::parse($s->last_assigned_at)->lte($cooldownDate);
+            })
+            ->sortBy([
+                ['beat_round', 'asc'],
+                ['last_assigned_at', 'asc'],
+                ['id', 'asc'],
+            ])
+            ->shuffle()   // relax fairness, NOT cooldown
+            ->values();
+
+        /** ----------------------------------------
+         * FALLBACK IF COOLDOWN BLOCKS TOO MANY
+         * ---------------------------------------- */
+        // if ($companyStudents->count() < $requiredStudents) {
+        //     $companyStudents = $baseStudents
+        //         ->sortBy([
+        //             ['beat_round', 'asc'],
+        //             ['last_assigned_at', 'asc'],
+        //             ['id', 'asc'],
+        //         ])
+        //         ->values();
+        // }
+        if ($companyStudents->count() < $requiredStudents) {
+        $companyStudents = $baseStudents
+        ->filter(function ($s) use ($cooldownDate) {
+            return is_null($s->last_assigned_at)
+                || Carbon::parse($s->last_assigned_at)->lte($cooldownDate);
+        })
+        ->shuffle()   // relax fairness, NOT cooldown
+        ->values();
 }
 
 
+        /** ----------------------------------------
+         * GENDER / EXCEPTION LOGIC (UNCHANGED IDEA)
+         * ---------------------------------------- */
+        if (!empty($area->beat_exception_ids)) {
+            $exceptions = json_decode($area->beat_exception_ids, true);
 
-    // Fill Beats
-    public function fillBeats(Request $request)
-    {
-        $date = $request->input('date', Carbon::today()->toDateString());
-        if (Beat::where('date', $date)->exists()) {
-            return redirect()->back()->with('info', 'Beats already generated for '.$date);
-            // return response()->json(['message' => 'Beats already generated for ' . $date], 200);
+            if (in_array(1, $exceptions)) {
+                $companyStudents = $companyStudents->where('gender', 'F')->values();
+            } elseif (in_array(2, $exceptions)) {
+                $companyStudents = $companyStudents->where('gender', 'M')->values();
+            }
+        } else {
+            $preferred = ($startAt === '06:00' || $startAt === '12:00')
+                ? $companyStudents->where('gender', 'F')
+                : $companyStudents->where('gender', 'M');
+
+            if ($preferred->isNotEmpty()) {
+                // Prefer but do NOT exclude others
+                $companyStudents = $preferred
+                    ->merge($companyStudents->diff($preferred))
+                    ->values();
+            }
         }
 
-        // Fetch active students (only those eligible for beats)
-        $activeStudents = Student::where('beat_status', 1)
-            ->where('session_programme_id', 10)
-            ->orderBy('beat_round')
-            ->orderBy('id')
-            ->get();
+        /** ----------------------------------------
+         * PLATOON DISTRIBUTION (NO SHUFFLE)
+         * ---------------------------------------- */
+        $studentsByPlatoonInGroup = $companyStudents->groupBy('platoon');
+        $platoons = $currentGroup->toArray();
+        $numPlatoons = count($platoons);
 
-        // Group students by company and platoon
-        $studentsByCompany = $activeStudents->groupBy('company_id');
-        $studentsByPlatoon = $activeStudents->groupBy('platoon');
+        if ($numPlatoons > 0 && $requiredStudents > 0) {
 
-        // Fetch guard and patrol areas with proper time filters
-        $guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
-        $patrolAreas = $this->filterAreasByTimeExceptions(PatrolArea::all());
+            $studentsPerPlatoon = intdiv($requiredStudents, $numPlatoons);
+            $remaining = $requiredStudents % $numPlatoons;
 
-        // Track used student IDs to prevent duplication across all roles
-        $usedStudentIds = [];
+            foreach ($platoons as $platoon) {
 
-        // Generate beats for guards
-        $guardBeats = $this->generateBeats($guardAreas, $studentsByCompany, $studentsByPlatoon, 'guards', $date, $usedStudentIds);
+                $need = $studentsPerPlatoon + ($remaining-- > 0 ? 1 : 0);
 
-        // Generate beats for patrols
-        $patrolBeats = $this->generateBeats($patrolAreas, $studentsByCompany, $studentsByPlatoon, 'patrols', $date, $usedStudentIds);
+                $platoonStudents = ($studentsByPlatoonInGroup[$platoon] ?? collect())
+                    ->whereNotIn('id', $usedStudentIds)
+                    ->sortBy([
+                        ['beat_round', 'asc'],
+                        ['last_assigned_at', 'asc'],
+                        ['id', 'asc'],
+                    ])
+                    ->take($need)
+                    ->pluck('id')
+                    ->toArray();
 
-        // Assign reserves for each company
-        $reserveStudents = [];
-        foreach ($studentsByCompany as $companyId => $students) {
-            $reserveStudents = array_merge($reserveStudents, $this->assignReserves($companyId, $date, $usedStudentIds));
+                    // Merge into assigned & used lists
+                $assignedStudentIds = array_merge($assignedStudentIds, $platoonStudents);
+                $usedStudentIds     = array_merge($usedStudentIds, $platoonStudents);
+       
+            // Remove these students from the platoon pool immediately
+            if (isset($studentsByPlatoonInGroup[$platoon])) {
+                $studentsByPlatoonInGroup[$platoon] = $studentsByPlatoonInGroup[$platoon]
+                    ->whereNotIn('id', $platoonStudents)
+                    ->values();
+            }
+            
+            }
         }
 
-        // Assign Leaders on Duty for each company
-        $leadersOnDuty = [];
-        foreach ($studentsByCompany as $companyId => $students) {
-            // $leadersOnDuty = array_merge($leadersOnDuty, $this->assignLeadersOnDuty($companyId, $date, $usedStudentIds));
+        /** ----------------------------------------
+         * FILL ANY REMAINING SLOTS FAIRLY
+         * ---------------------------------------- */
+        $unfilled = $requiredStudents - count($assignedStudentIds);
+
+        if ($unfilled > 0) {
+            $extras = $companyStudents
+                ->whereNotIn('id', $usedStudentIds)
+                ->shuffle()      // important!
+                ->sortBy([
+                    ['beat_round', 'asc'],
+                    ['last_assigned_at', 'asc'],
+                ])
+                ->pluck('id')
+                ->take($unfilled)
+                ->toArray();
+
+            $assignedStudentIds = array_merge($assignedStudentIds, $extras);
+            $usedStudentIds     = array_merge($usedStudentIds, $extras);
         }
 
-        // Save everything to the database in a single transaction
-        DB::transaction(function () use ($guardBeats, $patrolBeats, $reserveStudents, $leadersOnDuty) {
-            foreach (array_merge($guardBeats, $patrolBeats) as $beatData) {
-                $beat = Beat::create($beatData);
+        /** ----------------------------------------
+         * UPDATE BEAT ROUND
+         * ---------------------------------------- */
+        Student::whereIn('id', $assignedStudentIds)->increment('beat_round');
 
-                $beat->students()->attach(json_decode($beatData['student_ids']));
-            }
+        // Update last_assigned_at for cooldown
+        Student::whereIn('id', $assignedStudentIds)->update(['last_assigned_at' => $date]);
 
-            // Save reserve students
-
-            foreach ($reserveStudents as $reserve) {
-                BeatReserve::create($reserve);
-            }
-
-            // Save leaders on duty
-            foreach ($leadersOnDuty as $leader) {
-                BeatLeaderOnDuty::create($leader);
-            }
-        });
-
-        return redirect()->back()->with('success', 'Beats generated successfully for '.$date);
-        // return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
+        if (!empty($assignedStudentIds)) {
+            $beats[] = [
+                'beatType_id'   => $beatType === 'guards' ? 1 : 2,
+                'guardArea_id'  => $beatType === 'guards' ? $area->id : null,
+                'patrolArea_id' => $beatType === 'patrols' ? $area->id : null,
+                'student_ids'   => json_encode($assignedStudentIds),
+                'date'          => $date,
+                'start_at'      => $startAt,
+                'end_at'        => $endAt,
+                'status'        => true,
+                'company_id'    => $area->company_id ?? 0, // <-- ensure it exists, default 0
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ];
+        }
     }
 
+    return $beats;
+}
+
+
+    //FINAL FUNCTION TO FILL BEATS
+    // public function fillBeats(Request $request)
+    // {
+    //       ini_set('max_execution_time', 300); // 300 seconds = 5 minutes
+    //       set_time_limit(300);
+        
+    //     $date = $request->input('date', Carbon::today()->toDateString());
+    //     if (Beat::where('date', $date)->exists()) {
+    //         return redirect()->back()->with('info', 'Beats already generated for '.$date);
+    //         // return response()->json(['message' => 'Beats already generated for ' . $date], 200);
+    //     }
+
+    //     // Fetch active students (only those eligible for beats)
+    //     $activeStudents = Student::where('beat_status', 1)
+    //         ->where('session_programme_id', 10)
+    //         ->orderBy('beat_round')
+    //         ->orderBy('id')
+    //         ->get();
+
+    //     $companyStudents = $companyStudents->shuffle();
+
+
+    //     // Group students by company and platoon
+    //     $studentsByCompany = $activeStudents->groupBy('company_id');
+    //     $studentsByPlatoon = $activeStudents->groupBy('platoon');
+
+    //     // Fetch guard and patrol areas with proper time filters
+    //     $guardAreas = $this->filterAreasByTimeExceptions(GuardArea::all());
+    //     $patrolAreas = $this->filterAreasByTimeExceptions(PatrolArea::all());
+
+    //     // Track used student IDs to prevent duplication across all roles
+    //     $usedStudentIds = [];
+
+    //     // Generate beats for guards
+    //     $guardBeats = $this->generateBeats($guardAreas, $studentsByCompany, $studentsByPlatoon, 'guards', $date, $usedStudentIds);
+
+    //     // Generate beats for patrols
+    //     $patrolBeats = $this->generateBeats($patrolAreas, $studentsByCompany, $studentsByPlatoon, 'patrols', $date, $usedStudentIds);
+
+    //     // Assign reserves for each company
+    //     $reserveStudents = [];
+    //     foreach ($studentsByCompany as $companyId => $students) {
+    //         $reserveStudents = array_merge($reserveStudents, $this->assignReserves($companyId, $date, $usedStudentIds));
+    //     }
+
+    //     // Assign Leaders on Duty for each company
+    //     $leadersOnDuty = [];
+    //     foreach ($studentsByCompany as $companyId => $students) {
+    //         // $leadersOnDuty = array_merge($leadersOnDuty, $this->assignLeadersOnDuty($companyId, $date, $usedStudentIds));
+    //     }
+
+    //     // Save everything to the database in a single transaction
+    //     DB::transaction(function () use ($guardBeats, $patrolBeats, $reserveStudents, $leadersOnDuty) {
+    //         foreach (array_merge($guardBeats, $patrolBeats) as $beatData) {
+    //             $beat = Beat::create($beatData);
+
+    //             $beat->students()->attach(json_decode($beatData['student_ids']));
+    //         }
+
+    //         // Save reserve students
+
+    //         foreach ($reserveStudents as $reserve) {
+    //             BeatReserve::create($reserve);
+    //         }
+
+    //         // Save leaders on duty
+    //         foreach ($leadersOnDuty as $leader) {
+    //             BeatLeaderOnDuty::create($leader);
+    //         }
+    //     });
+
+    //     return redirect()->back()->with('success', 'Beats generated successfully for '.$date);
+    //     // return response()->json(['message' => 'Beats generated successfully for ' . $date], 200);
+    // }
+
+    public function fillBeats(Request $request)
+{
+    ini_set('max_execution_time', 300);
+    set_time_limit(300);
+
+    $date = $request->input('date', Carbon::today()->toDateString());
+
+
+ // --- RESET STUDENTS FOR TESTING ---
+    // Student::where('session_programme_id', 10)
+    //     ->update([
+    //         'beat_status' => 1,
+    //         'beat_round' => 0,
+    //         'last_assigned_at' => null, // reset cooldown
+    //     ]);
+
+    // // Also clear used IDs for this test run
+    // $usedStudentIds = [];
+
+//End of RESETTING 
+
+
+    // Prevent duplicate generation for the same date
+    if (Beat::where('date', $date)->exists()) {
+        return redirect()->back()->with('info', 'Beats already generated for ' . $date);
+    }
+
+    // Fetch all active students
+    $activeStudents = Student::where('beat_status', 1)
+        ->where('session_programme_id', 10)
+        ->orderBy('beat_round')
+        ->orderBy('id')
+        ->get();
+
+    // --- ONE GROUP DEFINED ---
+    $singleGroup = collect([10, 11, 12, 13, 14, 15, 16, 17, 18]);
+
+    // Group students by company and platoon
+    $studentsByCompany = $activeStudents->groupBy('company_id');
+    $studentsByPlatoon = $activeStudents->groupBy('platoon');
+
+    // Filter guard and patrol areas by time exceptions
+    $guardAreas  = $this->filterAreasByTimeExceptions(GuardArea::all());
+    $patrolAreas = $this->filterAreasByTimeExceptions(PatrolArea::all());
+
+    // Track used student IDs to avoid repetition across beats
+    $usedStudentIds = [];
+
+    // --- GENERATE BEATS ---
+    $guardBeats  = $this->generateBeats($guardAreas, $studentsByCompany, $studentsByPlatoon, 'guards', $date, $usedStudentIds, $singleGroup);
+    
+     // Avoid Assigning same student within cooldown period (i.e) Rest period of 4 days
+    foreach ($guardBeats as $beat) {
+    if (!isset($beat['company_id'])) continue; // skip if missing
+
+    $companyId = $beat['company_id'];
+
+    foreach (json_decode($beat['student_ids']) as $sid) {
+        if (isset($studentsByCompany[$companyId])) {
+            $student = $studentsByCompany[$companyId]->where('id', $sid)->first();
+            if ($student) {
+                $student->last_assigned_at = $date;
+            }
+        }
+    }
+}
+
+    $patrolBeats = $this->generateBeats($patrolAreas, $studentsByCompany, $studentsByPlatoon, 'patrols', $date, $usedStudentIds, $singleGroup);
+
+    // --- ASSIGN RESERVES PER COMPANY ---
+    $reserveStudents = [];
+    foreach ($studentsByCompany as $companyId => $students) {
+        $reserveStudents = array_merge(
+            $reserveStudents,
+            $this->assignReserves($companyId, $date, $usedStudentIds, $singleGroup)
+        );
+    }
+
+    // --- ASSIGN LEADERS ON DUTY (OPTIONAL) ---
+    $leadersOnDuty = [];
+    foreach ($studentsByCompany as $companyId => $students) {
+        // $leadersOnDuty = array_merge($leadersOnDuty, $this->assignLeadersOnDuty($companyId, $date, $usedStudentIds, $singleGroup));
+    }
+
+    // --- SAVE ALL DATA IN TRANSACTION ---
+    DB::transaction(function () use ($guardBeats, $patrolBeats, $reserveStudents, $leadersOnDuty) {
+        foreach (array_merge($guardBeats, $patrolBeats) as $beatData) {
+            $beat = Beat::create($beatData);
+            $beat->students()->attach(json_decode($beatData['student_ids']));
+        }
+
+        foreach ($reserveStudents as $reserve) {
+            BeatReserve::create($reserve);
+        }
+
+        foreach ($leadersOnDuty as $leader) {
+            BeatLeaderOnDuty::create($leader);
+        }
+    });
+
+    return redirect()->back()->with('success', 'Beats generated successfully for ' . $date);
+}
+
+
+// Function to filter areas based on time exceptions
     public function filterAreasByTimeExceptions($areas)
     {
         $filteredAreas = [];
@@ -926,11 +1020,11 @@ public function skippedStudents(Request $request)
     // public function assignLeadersOnDuty($companyId, $date, &$usedStudentIds)
     // {
     //     // Check if leaders on duty have already been assigned for the given date
-    //     // $existingLeadersOnDuty = ::where('beat_date', $date)
+    //     // $existingLeadersOnDuty = BeatLeaderOnDuty::where('beat_date', $date)
     //     //     ->where('company_id', $companyId)
     //     //     ->exists();
 
-    //       $existingLeadersOnDuty = ::where('beat_date', $date)
+    //       $existingLeadersOnDuty = BeatLeaderOnDuty::where('beat_date', $date)
     //             ->where('company_id', $companyId)
     //                 ->count();
 
@@ -1002,7 +1096,7 @@ public function assignLeadersOnDuty($companyId, $date)
 
         // Count already assigned leaders
         $existingCount = BeatLeaderOnDuty::where('company_id', $companyId)
-        ->where('beat_date', $date)
+            ->where('beat_date', $date)
             ->count();
 
         if ($existingCount >= 2) {
@@ -1092,6 +1186,9 @@ public function assignLeadersOnDuty($companyId, $date)
      */
     public function assignReserves($companyId, $date, &$usedStudentIds)
     {
+         // Determine cooldown date (4 days)
+        $cooldownDate = Carbon::parse($date)->subDays(4);
+
         // Check if reserves have already been assigned for the given date
         $existingReserves = BeatReserve::where('beat_date', $date)
             ->where('company_id', $companyId)
@@ -1115,37 +1212,52 @@ public function assignLeadersOnDuty($companyId, $date)
             ->flatten()
             ->toArray();
 
-        $assignedLeaderIds = BeatLeaderOnDuty::where('beat_date', $date)
+        $assignedLeaderIds = BeatLeaderonDuty::where('beat_date', $date)
             ->where('company_id', $companyId)
             ->pluck('student_id')
             ->toArray();
 
         $alreadyAssigned = array_merge($assignedStudentIds, $assignedLeaderIds, $usedStudentIds);
 
-        // Fetch eligible students (ordered by beat_round and id)
+        // // Fetch eligible students (ordered by beat_round and id)
+        // $eligibleStudents = Student::where('beat_status', 1)
+        //     ->where('company_id', $companyId)
+        //     ->where('session_programme_id', 10)
+        //     ->whereNotIn('id', $alreadyAssigned) // Avoid duplication
+        //     ->orderBy('beat_round', 'asc')
+        //     ->orderBy('id', 'asc')
+        //     ->get();
+
+        // if ($eligibleStudents->isEmpty()) {
+        //     return []; // Ensure an array is returned
+        // }
+        // Fetch eligible students
         $eligibleStudents = Student::where('beat_status', 1)
             ->where('company_id', $companyId)
             ->where('session_programme_id', 10)
-            ->whereNotIn('id', $alreadyAssigned) // Avoid duplication
-            ->orderBy('beat_round', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        if ($eligibleStudents->isEmpty()) {
-            return []; // Ensure an array is returned
-        }
+            ->whereNotIn('id', $alreadyAssigned)  // Already assigned in other beats/reserves
+            ->whereNotIn('id', $usedStudentIds)   // Already used in this function run
+            ->where(function($query) use ($cooldownDate) {
+                $query->whereNull('last_assigned_at')             // Never assigned before
+                    ->orWhere('last_assigned_at', '<=', $cooldownDate); // Cooldown passed
+            })
+            ->get()
+            ->shuffle() // Optional: make selection fair, not always low-id first
+            ->values();
 
         // Dynamically determine platoon groups A & B
-        $totalPlatoons = $eligibleStudents->groupBy('platoon')->keys()->sort()->values();
-        $mid = floor($totalPlatoons->count() / 2);
-        $groupA = $totalPlatoons->slice(0, $mid)->values();
-        $groupB = $totalPlatoons->slice($mid)->values();
-        $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
-        // $currentGroup = $groupB;
-        // $groupBx = [1, 2, 3, 4, 5, 6, 7];
+        // $totalPlatoons = $eligibleStudents->groupBy('platoon')->keys()->sort()->values();
+        // $mid = floor($totalPlatoons->count() / 2);
+        // $groupA = $totalPlatoons->slice(0, $mid)->values();
+        // $groupB = $totalPlatoons->slice($mid)->values();
+        // $currentGroup = (Carbon::parse($date)->day % 2 === 1) ? $groupA : $groupB;
 
-        // Convert array into a Laravel Collection
-        // $currentGroup = collect($groupBx);
+        // For simplicity, using fixed groups for now
+        // $currentGroup = $groupBx ;
+        $groupBx = [10, 11, 12, 13, 14, 15, 16,17,18];
+
+       // Convert array into a Laravel Collection
+        $currentGroup = collect($groupBx);
 
         // Group students by platoon in the current group
         $studentsByPlatoonInGroup = $eligibleStudents->whereIn('platoon', $currentGroup)->groupBy('platoon');
@@ -1222,7 +1334,7 @@ public function assignLeadersOnDuty($companyId, $date)
         Student::whereIn('id', collect($reserves)->pluck('student_id'))->update(['beat_status' => 2]);
 
         return $reserves; // Always return an array
-    }
+}
 
     // Beat Report
     // public function showReport(Request $request)
@@ -1258,7 +1370,6 @@ public function assignLeadersOnDuty($companyId, $date)
         return $pdf->download('history.pdf');
     }
 
-
     public function showReport2(Request $request)
     {
         $startDate = $request->input('start_date', null);
@@ -1270,7 +1381,6 @@ public function assignLeadersOnDuty($companyId, $date)
         return view('beats.beat_report', ['report' => $report, 'companies' => $companies]);
     }
 
-
     private function beatHistory($company)
     {
         // $companies = Company::all();
@@ -1278,7 +1388,6 @@ public function assignLeadersOnDuty($companyId, $date)
         // foreach($companies as $company){
         $students = $company->students->where('session_programme_id', 10);
         $totalStudents = count($students);
-        
         $totalEligibleStudents = count($students->whereIn('beat_status', [1, 2, 3]));
         $totalIneligibleStudents = count($students->whereNotIn('beat_status', [1, 2, 3]));
         // $eligibleStudentsPercent = round((($totalStudents - $totalIneligibleStudents) / $totalStudents) * 100, 2);
@@ -1384,7 +1493,6 @@ public function assignLeadersOnDuty($companyId, $date)
         return $pdf->download('beat_report.pdf');
     }
 
-    // Generate Beat Report
     private function generateBeatReport($companyId = null, $startDate = null, $endDate = null, $dateFilter = null)
     {
         $companies = is_null($companyId) ? Company::all() : Company::where('id', $companyId)->get();
@@ -1433,7 +1541,6 @@ public function assignLeadersOnDuty($companyId, $date)
             )
             ->groupBy('company_id')
             ->get();
-
         // Categorize ineligible students
         $vitengoCategories = [];
         $emergencyCategories = [];
@@ -1566,7 +1673,6 @@ public function assignLeadersOnDuty($companyId, $date)
         return redirect()->route('beats.index')->with('success', 'Beat deleted successfully!');
     }
 
-
     public function beatReserves($companyId, $date)
     {
         $reserves = BeatReserve::where('company_id', $companyId)->where('beat_date', $date)->get();
@@ -1642,4 +1748,148 @@ public function assignLeadersOnDuty($companyId, $date)
 
         return view('beats.reserve_replacement', compact('reserve', 'students', 'company', 'date', 'beatReserveId'));
     }
+
+// Assigned On Beats (refactored)
+public function assignedOnBeats(Request $request) {
+    $date = $request->date
+        ? Carbon::parse($request->date)->format('Y-m-d')
+        : now()->format('Y-m-d');
+
+    $carbonDate = Carbon::parse($date);
+    $shift = $carbonDate->hour < 12 ? 'day' : 'night';
+
+    // Load guard areas
+    $areas = GuardArea::select('id','company_id','number_of_guards','beat_exception_ids')
+        ->get()
+        ->map(fn($area) => [
+            'area' => $area,
+            'start_at' => $shift === 'day' ? '06:00' : '18:00',
+            'end_at'   => $shift === 'day' ? '18:00' : '06:00',
+        ])
+        ->toArray();
+
+    // Fetch only active students
+ 
+    $students = Student::where('session_programme_id', 10)
+        ->where('beat_status', 1) // Only active students
+        ->select('id','first_name','last_name','company_id','platoon','beat_status','beat_round','last_assigned_at','gender')
+        ->get();
+
+    // Group by company
+    $studentsByCompany = $students->groupBy('company_id');
+
+    // Platoon rotation
+    $platoons = $students->pluck('platoon')->unique()->sort()->values();
+    $mid = intdiv($platoons->count(), 2);
+    $groupA = $platoons->slice(0, $mid)->values();
+    $groupB = $platoons->slice($mid)->values();
+    $currentGroup = ($carbonDate->day % 2 === 1) ? $groupA->toArray() : $groupB->toArray();
+
+    $usedStudentIds = [];
+
+    // Generate beats
+    $beats = $this->generateBeats($areas, $studentsByCompany, $currentGroup, 'guards', $date, $usedStudentIds);
+
+    // Save assigned IDs in session
+    session([
+        'assigned_student_ids' => $usedStudentIds,
+        'beat_date' => $date,
+    ]);
+
+    // Assigned students in report format
+    $assignedStudents = $students->whereIn('id', $usedStudentIds)
+        ->map(fn($s) => [
+            'id' => $s->id,
+            'name' => $s->first_name . ' ' . $s->last_name,
+            'company' => $s->company_id,
+            'platoon' => $s->platoon,
+            'beat_round' => $s->beat_round,
+            'last_beat_date' => $s->last_assigned_at ? Carbon::parse($s->last_assigned_at)->format('Y-m-d') : null,
+            'status' => $s->beat_status,
+            'reason' => 'Assigned',
+            'rest_days_remaining' => 0,
+            'next_eligible_date' => Carbon::parse($s->last_assigned_at)->addDays(5)->format('Y-m-d') ?? null,
+        ]);
+
+    // Ineligible students (rest + skipped)
+    $ineligibleStudents = $students->whereNotIn('id', $usedStudentIds)
+        ->map(function($s) use ($date) {
+            $cutoffDate = Carbon::parse($date)->subDays(5);
+            $rest_days = $s->last_assigned_at 
+                ? max(0, 5 - Carbon::parse($s->last_assigned_at)->diffInDays($date)) 
+                : 0;
+            return [
+                'id' => $s->id,
+                'name' => $s->first_name . ' ' . $s->last_name,
+                'company' => $s->company_id,
+                'platoon' => $s->platoon,
+                'beat_round' => $s->beat_round,
+                'last_assigned_at' => $s->last_assigned_at ? Carbon::parse($s->last_assigned_at)->format('Y-m-d') : null,
+                'status' => $s->beat_status,
+                'reason' => $rest_days > 0 ? 'On rest' : 'Not selected',
+                'rest_days_remaining' => $rest_days,
+                'next_eligible_date' => $s->last_assigned_at ? Carbon::parse($s->last_assigned_at)->addDays(5)->format('Y-m-d') : null,
+            ];
+        });
+
+    return view('beats.test-beat', compact('beats','assignedStudents','ineligibleStudents','date'));
+}
+
+
+// Skipped Students (refactored)
+public function skippedStudents(Request $request) {
+    $date = $request->date ? Carbon::parse($request->date)->format('Y-m-d') : now()->format('Y-m-d');
+    $carbonDate = Carbon::parse($date);
+    $minRestDays = 5;
+    $cutoffDate = $carbonDate->copy()->subDays($minRestDays);
+
+    $usedStudentIds = session('assigned_student_ids', []);
+
+    // Platoon rotation
+    $platoons = Student::where('session_programme_id', 10)
+        ->distinct()
+        ->orderBy('platoon')
+        ->pluck('platoon');
+
+    // $mid = intdiv($platoons->count(), 2);
+    // $groupA = $platoons->slice(0, $mid)->values();
+    // $groupB = $platoons->slice($mid)->values();
+    // $currentGroupArray = (($carbonDate->day % 2 === 1) ? $groupA : $groupB)->toArray();
+
+    // Convert array into a Laravel Collection
+    $groupBx = [10, 11, 12, 13, 14, 15, 16,17,18];
+
+    $currentGroup = collect($groupBx);
+
+    // Fetch only remaining students
+    $students = Student::where('session_programme_id', 10)
+        ->when(!empty($usedStudentIds), fn($q) => $q->whereNotIn('id', $usedStudentIds))
+        ->whereIn('platoon', $currentGroup)
+        ->select('id','first_name','last_name','platoon','beat_status','beat_round','last_assigned_at')
+        ->get();
+
+    $ineligibleStudents = $students->map(function($s) use ($cutoffDate, $carbonDate, $minRestDays) {
+        $s->reason_skipped = 'Not selected';
+        $s->rest_days_remaining = 0;
+        $s->next_eligible_date = null;
+        $s->eligible_tomorrow = false;
+
+        if ($s->beat_status == 4) {
+            $s->reason_skipped = 'Safari';
+        } elseif ($s->beat_status == 0 && $s->beat_round == 0) {
+            $s->reason_skipped = 'Kitengo';
+        } elseif ($s->last_assigned_at && Carbon::parse($s->last_assigned_at)->gte($cutoffDate)) {
+            $daysPassed = Carbon::parse($s->last_assigned_at)->diffInDays($carbonDate);
+            $s->rest_days_remaining = max(0, $minRestDays - $daysPassed);
+            $s->next_eligible_date = Carbon::parse($s->last_assigned_at)->addDays($minRestDays)->format('Y-m-d');
+            $s->eligible_tomorrow = $s->next_eligible_date === $carbonDate->copy()->addDay()->format('Y-m-d');
+            $s->reason_skipped = 'On rest';
+        }
+
+        return $s;
+    })->sortByDesc('eligible_tomorrow')->values();
+
+    return view('beats.skipped-students', compact('ineligibleStudents','date'));
+}
+
 }

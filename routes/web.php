@@ -186,12 +186,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/generate-certificate', [FinalResultController::class, 'generateCertificate'])->name('final.generateCertificate');
     
        
-// Route::get('/test-beats', [BeatController::class, 'testGenerateBeats']);
-Route::get('/test-beats', [BeatController::class, 'testGenerateBeats'])->name('beats.test_beats');
+Route::get('/test-beats', [BeatController::class, 'testGenerateBeats']);
+Route::get('/test-beats', [BeatController::class, 'assignedOnBeats'])->name('beats.test_beats');
 Route::get('/beats/guards/skipped', [BeatController::class, 'skippedStudents'])
     ->name('beats.guards.skipped');
 
-//Na Test Generate Beats
+
 
 
 

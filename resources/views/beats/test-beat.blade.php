@@ -155,7 +155,8 @@ th {
             <th>Company</th>
             <th>Platoon</th>
             <th>Beat Round</th>
-            <th>Last Beat Date</th>
+             <th>Beat Status</th>
+            <th>Assigned Date</th>
             <th>Status</th>
             <th>Reason / Notes</th>
             <th>Rest Days Remaining</th>
@@ -163,80 +164,33 @@ th {
         </tr>
     </thead>
     <tbody>
-        @foreach($assignedStudents as $student)
-        <tr class="assigned">
-            <td>{{ $student->id }}</td>
-            <td>{{ $student->first_name }} {{ $student->last_name }}</td>
-            <td>{{ $student->company_id }}</td>
-            <td>{{ $student->platoon }}</td>
-            <td>{{ $student->beat_round }}</td>
-            <td>{{ $student->last_beat_date }}</td>
-            <td>
-                @if($student->beat_status == 4)
-                    <span class="label label-safari">Safari</span>
-                @elseif($student->beat_status == 0 && $student->beat_round == 0)
-                    <span class="label label-kitengo">Kitengo</span>
-                @else
-                    <span class="label label-assigned">Assigned</span>
-                @endif
-            </td>
-            <td>{{ $student->reason_skipped ?? '-' }}</td>
-            <td>{{ $student->rest_days_remaining ?? 0 }}</td>
-            <td>{{ $student->next_eligible_date ?? '-' }}</td>
-        </tr>
-        @endforeach
+        
+       @foreach($assignedStudents as $student)
+<tr class="assigned">
+    <td>{{ $student->id }}</td>
+    <td>{{ $student->first_name }} {{ $student->last_name }}</td>
+    <td>{{ $student->company_id }}</td>
+    <td>{{ $student->platoon }}</td>
+    <td>{{ $student->beat_round }}</td>
+    <td>{{ $student->beat_status}}</td>
+    <td>{{ $student->last_assigned_at }}</td>
+    <td>
+        @if($student->beat_status == 4)
+            <span class="label label-safari">Safari</span>
+        @elseif($student->beat_status == 0 && $student->beat_round == 0)
+            <span class="label label-kitengo">Kitengo</span>
+        @else
+            <span class="label label-assigned">Assigned</span>
+        @endif
+    </td>
+     <td>{{ $student->reason_skipped }}</td>
+    <td>{{ $student->rest_days_remaining }}</td>
+    <td>{{ $student->next_eligible_date }}</td>
+</tr>
+@endforeach
+
+
     </tbody>
 </table>
 </div>
-
-    <!-- Ineligible / Skipped Students -->
-    <!-- <h3 id="skipped-table">Ineligible / Skipped Students</h3> -->
-
-    <!-- <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Company</th>
-                <th>Platoon</th>
-                <th>Beat Round</th>
-                <th>Last Beat Date</th>
-                <th>Status</th>
-                <th>Reason Skipped</th>
-                <th>Rest Days Remaining</th>
-                <th>Next Eligible Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($ineligibleStudents as $student)
-            <tr class="{{ $student->rest_days_remaining === 0 || $student->eligible_tomorrow ? 'eligible-tomorrow' : 'skipped' }}">
-                <td>{{ $student->id }}</td>
-                <td>{{ $student->first_name }} {{ $student->last_name }}</td>
-                <td>{{ $student->company_id }}</td>
-                <td>{{ $student->platoon }}</td>
-                <td>{{ $student->beat_round }}</td>
-                <td>{{ $student->last_beat_date }}</td>
-                <td>
-                    @if($student->rest_days_remaining === 0)
-                        <span class="label label-eligible">Eligible</span>
-                    @elseif($student->eligible_tomorrow)
-                        <span class="label label-eligible">Eligible Tomorrow</span>
-                    @elseif($student->reason_skipped === 'Safari')
-                        <span class="label label-safari">Safari</span>
-                    @elseif($student->reason_skipped === 'Kitengo')
-                        <span class="label label-kitengo">Kitengo</span>
-                    @else
-                        <span class="label label-skipped">Skipped</span>
-                    @endif
-                </td>
-                <td>{{ $student->reason_skipped }}</td>
-                <td>{{ $student->rest_days_remaining }}</td>
-                <td>{{ $student->next_eligible_date ?? '-' }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table> -->
-
-</div> <!-- container-page -->
-
 @endsection

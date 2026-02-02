@@ -100,7 +100,7 @@ th {
             <div class="page-header">
             <div class="selected-date">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <span class="date" style=" color: #2196F3;  margin-left: -10px; font-size: 22px;">
-            Selected Date: {{ $date }}
+            Selected Date: {{ $date }} & Platoon Group: {{ \Carbon\Carbon::parse($date)->day % 2 === 1 ? 'Group A' : 'Group B' }}
         </span>
 
         </div>
@@ -136,7 +136,7 @@ th {
                     <td>{{ $student->first_name }} {{ $student->last_name }}</td>
                     <td>{{ $student->company_id }}</td>
                     <td>{{ $student->platoon }}</td>
-                    <td>{{ $student->last_beat_date }}</td>
+                    <td>{{ $student->last_assigned_at }}</td>
                     <td>
                         @if($student->rest_days_remaining === 0)
                             <span class="label label-eligible">Eligible</span>
