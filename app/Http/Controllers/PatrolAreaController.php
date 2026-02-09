@@ -16,16 +16,39 @@ class PatrolAreaController extends Controller
      */
     public function index()
     {
-        $patrolAreas = PatrolArea::all();
-        $patrolAreas = $patrolAreas->map(function ($patrolArea) {
-            if($patrolArea->beat_exception_ids != NULL){
-              $patrolArea->beat_exceptions = BeatException::whereIn('id', json_decode($patrolArea->beat_exception_ids, true))->get(); 
-            }
-            if($patrolArea->beat_time_exception_ids != NULL){
-                $patrolArea->beat_time_exceptions = BeatTimeException::whereIn('id', json_decode($patrolArea->beat_time_exception_ids, true))->get(); 
-              }
-            return $patrolArea;
-        });
+        // $patrolAreas = PatrolArea::all();
+        // $patrolAreas = $patrolAreas->map(function ($patrolArea) {
+        //     if($patrolArea->beat_exception_ids != NULL){
+        //       $patrolArea->beat_exceptions = BeatException::whereIn('id', json_decode($patrolArea->beat_exception_ids, true))->get(); 
+        //     }
+        //     if($patrolArea->beat_time_exception_ids != NULL){
+        //         $patrolArea->beat_time_exceptions = BeatTimeException::whereIn('id', json_decode($patrolArea->beat_time_exception_ids, true))->get(); 
+        //       }
+        //     return $patrolArea;
+        // });
+
+        $patrolAreas = PatrolArea::all()->map(function ($patrolArea) {
+
+    $patrolArea->beat_exceptions = collect();
+    $patrolArea->beat_time_exceptions = collect();
+
+    if ($patrolArea->beat_exception_ids != null) {
+        $patrolArea->beat_exceptions = BeatException::whereIn(
+            'id',
+            json_decode($patrolArea->beat_exception_ids, true)
+        )->get();
+    }
+
+    if ($patrolArea->beat_time_exception_ids != null) {
+        $patrolArea->beat_time_exceptions = BeatTimeException::whereIn(
+            'id',
+            json_decode($patrolArea->beat_time_exception_ids, true)
+        )->get();
+    }
+
+    return $patrolArea;
+});
+
         //return $patrolAreas;
         return view('patrolArea.index', compact('patrolAreas'));
     }

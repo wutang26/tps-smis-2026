@@ -516,7 +516,10 @@
                         </li>
                         <li>
                             <a href="{{ route('beats.test_beats') }}">Beat Status</a>
-                        </li>                         
+                        </li> 
+                            <li>
+                            <a href="{{ route('beats.beat_assignment_logs') }}">Beat Logs</a>
+                        </li>                           
                     </ul>
                 </li>
             @endcan()

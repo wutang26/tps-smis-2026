@@ -1,0 +1,81 @@
+{
+    "telemetry.sqmId": "",
+    "telemetry.machineId": "1993cf5bf29e0e420c3cd8ec99b7b517fef575bdc8bfe12af4e8b956157f757a",
+    "telemetry.devDeviceId": "97034165-67e0-4eb2-ad5d-b7fc2a86c183",
+    "backupWorkspaces": {
+        "workspaces": [
+            {
+                "id": "6ef0685dd9edf7375cc23b526ffd4dd1",
+                "configURIPath": "file:///opt/lampp/htdocs/tps-smis-2026/%3D/Workspaces/1770093018641/workspace.json"
+            }
+        ],
+        "folders": [],
+        "emptyWindows": []
+    },
+    "windowControlHeight": 35,
+    "profileAssociations": {
+        "workspaces": {
+            "file:///opt/lampp/htdocs/tps-smis-2026/%3D/Workspaces/1770093018641/workspace.json": "__default__profile__"
+        },
+        "emptyWindows": {}
+    },
+    "theme": "vs-dark",
+    "themeBackground": "#1f1f1f",
+    "windowSplash": {
+        "zoomLevel": 0,
+        "baseTheme": "vs-dark",
+        "colorInfo": {
+            "foreground": "#cccccc",
+            "background": "#1f1f1f",
+            "editorBackground": "#1f1f1f",
+            "titleBarBackground": "#181818",
+            "titleBarBorder": "#2b2b2b",
+            "activityBarBackground": "#181818",
+            "activityBarBorder": "#2b2b2b",
+            "sideBarBackground": "#181818",
+            "sideBarBorder": "#2b2b2b",
+            "statusBarBackground": "#181818",
+            "statusBarBorder": "#2b2b2b",
+            "statusBarNoFolderBackground": "#1f1f1f"
+        },
+        "layoutInfo": {
+            "sideBarSide": "left",
+            "editorPartMinWidth": 220,
+            "titleBarHeight": 35,
+            "activityBarWidth": 48,
+            "sideBarWidth": 300,
+            "auxiliaryBarWidth": 0,
+            "statusBarHeight": 22,
+            "windowBorder": false
+        }
+    },
+    "windowSplashWorkspaceOverride": {
+        "layoutInfo": {
+            "sideBarWidth": 300,
+            "auxiliaryBarWidth": 300,
+            "workspaces": {
+                "6ef0685dd9edf7375cc23b526ffd4dd1": {
+                    "sideBarVisible": true,
+                    "auxiliaryBarVisible": false
+                }
+            }
+        }
+    },
+    "windowsState": {
+        "lastActiveWindow": {
+            "workspaceIdentifier": {
+                "id": "6ef0685dd9edf7375cc23b526ffd4dd1",
+                "configURIPath": "file:///opt/lampp/htdocs/tps-smis-2026/%3D/Workspaces/1770093018641/workspace.json"
+            },
+            "backupPath": "/opt/lampp/htdocs/tps-smis-2026/=/Backups/6ef0685dd9edf7375cc23b526ffd4dd1",
+            "uiState": {
+                "mode": 1,
+                "x": 0,
+                "y": 35,
+                "width": 1366,
+                "height": 733
+            }
+        },
+        "openedWindows": []
+    }
+}

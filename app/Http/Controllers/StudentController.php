@@ -1018,6 +1018,7 @@ public function assignReflectorDayOnly($studentId)
         $platoon   = Platoon::where('name', $platoon)->where('company_id', $company_id)->first();
         
         dd($platoon);
+        
         $selectedSessionId = session('selected_session');
         if (! $selectedSessionId) {
             $selectedSessionId = 1;

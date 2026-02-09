@@ -9,7 +9,9 @@ class Student extends Model
 {
     protected $casts = [
         'next_of_kin' => 'array',
+        'last_assigned_at' => 'datetime',
     ];
+
 
     protected $fillable = [
         'force_number', 'rank', 'first_name', 'middle_name', 'last_name',
@@ -26,6 +28,8 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
 
     public function admittedStudent()
     {

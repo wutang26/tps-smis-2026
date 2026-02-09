@@ -29,7 +29,7 @@
 
 <div class="container">
 
-
+beat_assignment_logs 
 <h2>Beats for {{ $date ?? ''}}</h2>
     
     <form action="{{ route('beats.byDate') }}" method="GET" class="mb-4">
@@ -37,7 +37,7 @@
             <div class="col-md-3">
                 <input type="date" name="date" class="form-control" value="{{ $date }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2">beat_assignment_logs 
                 <button type="submit" class="btn btn-primary">Filter</button>
             </div>
         </div>

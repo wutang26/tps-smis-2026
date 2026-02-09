@@ -1,0 +1,6 @@
+2026-02-02 23:30:18.878 [info] update#setState idle
+2026-02-02 23:30:48.886 [info] update#setState checking for updates
+2026-02-02 23:30:49.135 [info] update#setState idle
+2026-02-03 00:30:48.891 [info] update#setState checking for updates
+2026-02-03 00:30:49.635 [info] update#setState idle
+2026-02-03 00:59:57.535 [info] Extension host with pid 74855 exited with code: 0, signal: unknown.

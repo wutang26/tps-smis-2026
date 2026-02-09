@@ -84,6 +84,7 @@ use Illuminate\Support\Facades\Broadcast;
 
 
 
+
 require __DIR__.'/auth.php';
 
 Auth::routes();
@@ -185,15 +186,17 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/generate-transcript', [FinalResultController::class, 'generateTranscript'])->name('final.generateTranscript');
     Route::post('/generate-certificate', [FinalResultController::class, 'generateCertificate'])->name('final.generateCertificate');
     
-       
+
+//Additional Rputes   Kujua walio Baki
 Route::get('/test-beats', [BeatController::class, 'testGenerateBeats']);
 Route::get('/test-beats', [BeatController::class, 'assignedOnBeats'])->name('beats.test_beats');
 Route::get('/beats/guards/skipped', [BeatController::class, 'skippedStudents'])
     ->name('beats.guards.skipped');
 
-
-
-
+//Logging beat assignments
+// Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/beat_assignment_logs', [BeatController::class, 'viewBeatLogs'])->name('beats.beat_assignment_logs');
+// });
 
 
 

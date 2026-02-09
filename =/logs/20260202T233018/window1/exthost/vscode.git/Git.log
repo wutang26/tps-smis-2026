@@ -1,0 +1,132 @@
+2026-02-02 23:30:31.391 [info] [main] Log level: Info
+2026-02-02 23:30:31.391 [info] [main] Validating found git in: "git"
+2026-02-02 23:30:31.391 [info] [main] Using git "2.51.0" from "git"
+2026-02-02 23:30:31.391 [info] [Model][doInitialScan] Initial repository scan started
+2026-02-02 23:30:31.391 [info] > git rev-parse --show-toplevel [32ms]
+2026-02-02 23:30:31.391 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.404 [info] > git rev-parse --show-toplevel [5ms]
+2026-02-02 23:30:31.404 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.418 [info] > git rev-parse --show-toplevel [5ms]
+2026-02-02 23:30:31.418 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.434 [info] > git rev-parse --show-toplevel [5ms]
+2026-02-02 23:30:31.434 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.452 [info] > git rev-parse --show-toplevel [5ms]
+2026-02-02 23:30:31.453 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.464 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.464 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.474 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.474 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.484 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.484 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.494 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.494 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.504 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.504 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.522 [info] > git rev-parse --show-toplevel [5ms]
+2026-02-02 23:30:31.522 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.536 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.536 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.555 [info] > git rev-parse --show-toplevel [4ms]
+2026-02-02 23:30:31.555 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:31.572 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.572 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.583 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.583 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.595 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.595 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.606 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.606 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.616 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.616 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.624 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.624 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.632 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.632 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.639 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.640 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.647 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.647 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.657 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.657 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.664 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.664 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.671 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.671 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.679 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.679 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.686 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.686 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.693 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.693 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.701 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.701 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.709 [info] > git rev-parse --show-toplevel [2ms]
+2026-02-02 23:30:31.709 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.718 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:31.718 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:31.727 [info] [Model][doInitialScan] Initial repository scan completed - repositories (0), closed repositories (0), parent repositories (0), unsafe repositories (1)
+2026-02-02 23:30:45.854 [info] > git rev-parse --show-toplevel [6ms]
+2026-02-02 23:30:45.854 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:45.866 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:30:45.866 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:30:47.647 [info] > git rev-parse --show-toplevel [4ms]
+2026-02-02 23:30:47.647 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:30:47.664 [info] > git rev-parse --show-toplevel [4ms]
+2026-02-02 23:30:47.665 [info] fatal: not a git repository (or any of the parent directories): .git
+2026-02-02 23:32:15.380 [info] > git rev-parse --show-toplevel [6ms]
+2026-02-02 23:32:15.380 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:32:17.747 [info] > git rev-parse --show-toplevel [3ms]
+2026-02-02 23:32:17.748 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
+2026-02-02 23:32:33.634 [info] > git rev-parse --show-toplevel [5ms]
+2026-02-02 23:32:33.634 [info] fatal: detected dubious ownership in repository at '/opt/lampp/htdocs/tps-smis-2026'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/lampp/htdocs/tps-smis-2026
