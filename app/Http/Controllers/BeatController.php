@@ -876,75 +876,42 @@ public function generateBeats($areas, $studentsByCompany, $studentsByPlatoon, $b
 
             // -------------------------------
             // NIGHT SHIFT FALLBACK: pick male with lowest beat_round & longest last_assigned_at
-            // if ($isNightShift && empty($eligible)) {
-            //     $allMales = array_filter($companyStudents->all(), fn($s) => $s->gender === 'M');
-
-            //     // Sort by beat_round ascending, then last_assigned_at ascending (longest unassigned first)
-            //     // usort($allMales, function ($a, $b) {
-            //     // if ($a->beat_round !== $b->beat_round) {
-            //     // return $a->beat_round <=> $b->beat_round;
-            //     // }
-            //     // $timeA = $a->last_assigned_at ?? now()->subYears(10); //fallback far past
-            //     // $timeB = $b->last_assigned_at ?? now()->subYears(10); //NB: Current time - last 10 years is fall back
-
-            //     // return strtotime($timeA) <=> strtotime($timeB);
-            //     // });
-            //     // fairness sort: lowest beat_round + longest rest
-            //     usort($allMales, function ($a, $b) {
-
-            //         // lowest beat_round wins
-            //         if ($a->beat_round !== $b->beat_round) {
-            //             return $a->beat_round <=> $b->beat_round;
-            //         }
-
-            //         // if same beat_round → longest rest wins
-            //         $restA = $a->last_assigned_at
-            //             ? \Carbon\Carbon::parse($a->last_assigned_at)->timestamp
-            //             : 0;
-
-            //         $restB = $b->last_assigned_at
-            //             ? \Carbon\Carbon::parse($b->last_assigned_at)->timestamp
-            //             : 0;
-
-            //         return $restA <=> $restB;
-            //     });
-
-
-            //     $eligible = $allMales;
-            // }
-            
-            //-----------End Ya zamani---------
             if ($isNightShift && empty($eligible)) {
-    $allMales = array_filter($companyStudents->all(), function ($s) use ($fallbackCooldownLimit, $currentGroup) {
-        // Only males in currentGroup platoons
-        if ($s->gender !== 'M') return false;
-        if (!in_array($s->platoon, $currentGroup)) return false;
+                $allMales = array_filter($companyStudents->all(), fn($s) => $s->gender === 'M');
 
-        if (!$s->last_assigned_at) return true; // never assigned
-        return Carbon::parse($s->last_assigned_at)->lte($fallbackCooldownLimit);
-    });
+                // Sort by beat_round ascending, then last_assigned_at ascending (longest unassigned first)
+                // usort($allMales, function ($a, $b) {
+                // if ($a->beat_round !== $b->beat_round) {
+                // return $a->beat_round <=> $b->beat_round;
+                // }
+                // $timeA = $a->last_assigned_at ?? now()->subYears(10); //fallback far past
+                // $timeB = $b->last_assigned_at ?? now()->subYears(10); //NB: Current time - last 10 years is fall back
 
-    // Sort by beat_round ascending, then last_assigned_at ascending
-    usort($allMales, function ($a, $b) {
-        if ($a->beat_round !== $b->beat_round) return $a->beat_round <=> $b->beat_round;
+                // return strtotime($timeA) <=> strtotime($timeB);
+                // });
+                // fairness sort: lowest beat_round + longest rest
+                usort($allMales, function ($a, $b) {
 
-        $restA = $a->last_assigned_at
-            ? Carbon::parse($a->last_assigned_at)->timestamp
-            : 0;
-        $restB = $b->last_assigned_at
-            ? Carbon::parse($b->last_assigned_at)->timestamp
-            : 0;
+                    // lowest beat_round wins
+                    if ($a->beat_round !== $b->beat_round) {
+                        return $a->beat_round <=> $b->beat_round;
+                    }
 
-        return $restA <=> $restB;
-    });
+                    // if same beat_round → longest rest wins
+                    $restA = $a->last_assigned_at
+                        ? \Carbon\Carbon::parse($a->last_assigned_at)->timestamp
+                        : 0;
 
-    $eligible = $allMales;
-}
+                    $restB = $b->last_assigned_at
+                        ? \Carbon\Carbon::parse($b->last_assigned_at)->timestamp
+                        : 0;
 
-            // ---------end of complicated Fallback----------------------
+                    return $restA <=> $restB;
+                });
 
-
-
+                $eligible = $allMales;
+            }
+            // -------------------------------
 
             // Gender preference for non-night shifts
             if (!empty($area->beat_exception_ids)) {
