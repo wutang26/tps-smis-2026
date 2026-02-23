@@ -514,9 +514,6 @@
                         <li>
                             <a href="{{url('/report/generate')}}">Beat Report</a>
                         </li>
-                        <li>
-                            <a href="{{ route('beats.test_beats') }}">Beat Status</a>
-                        </li> 
                             <li>
                             <a href="{{ route('beats.beat_assignment_logs') }}">Beat Logs</a>
                         </li>                           
@@ -560,6 +557,12 @@
                         <li>
                             <a href="{{ route('reports.leaves') }}">Leaves</a>
                         </li>
+
+                        @hasanyrole('Admin|Super Administrator|clerk|staff')
+                           <li>
+                            <a href="{{ route('daily-reports.index') }}">Feedback From Beats & Patrol</a>
+                        </li>
+                        @endhasanyrole
                     </ul>
                 </li>
                 </li>

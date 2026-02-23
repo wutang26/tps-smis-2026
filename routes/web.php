@@ -80,6 +80,7 @@ use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\FeedbackController;
 
 
 
@@ -718,3 +719,23 @@ Route::get('weapons/create', [WeaponController::class, 'create'])->name('weapons
 
 Route::post('weapons', [WeaponController::class, 'store'])->name('weapons.store');
 
+
+//Feedback Report controller from clerks and report
+Route::middleware(['auth'])->group(function () {
+    
+        // View reports (for officers/admin)
+    Route::get('/daily-reports', [FeedbackController::class, 'index'])->name('daily-reports.index');
+  
+    //create
+    Route::get('/daily-reports/create', [FeedbackController::class, 'create'])->name('daily-reports.create');
+
+    // Submit form
+    Route::post('/daily-reports', [FeedbackController::class, 'store'])->name('daily-reports.store');
+
+      Route::get('daily-reports/{id}/edit', [FeedbackController::class, 'edit'])->name('daily-reports.edit');
+
+    Route::put('daily-reports/{id}/update', [FeedbackController::class, 'update'])->name('daily-reports.update');
+
+    Route::delete('daily-reports/{id}/delete', [FeedbackController::class, 'destroy'])->name('daily-reports.destroy');
+
+});

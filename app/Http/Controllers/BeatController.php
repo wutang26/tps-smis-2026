@@ -2101,35 +2101,6 @@ public function assignLeadersOnDuty($companyId, $date)
     }
 
 
-    //Log Beat History
-// public function viewBeatLogs()
-// {
-//     $logs = BeatAssignmentLog::with([
-//         'student',
-//         'guardArea',
-//         'patrolArea'
-//     ])
-//     ->orderBy('date', 'desc')->paginate(10); // 👈 number per page
-
-//     return view('admin.beat_logs', compact('logs'));
-// }
-
-// public function viewBeatLogs()
-// {
-//     $logs = BeatAssignmentLog::with([
-//             'student',
-//             'guardArea',
-//             'patrolArea'
-//         ])
-//         ->whereHas('student', function ($q) {
-//             $q->where('session_programme_id', 10)
-//               ->whereBetween('platoon', [1, 18]);
-//         })
-//         ->orderBy('date', 'desc')
-//         ->paginate(25);
-
-//     return view('admin.beat_logs', compact('logs'));
-// }
 
 public function viewBeatLogs(Request $request)
 {
@@ -2151,7 +2122,7 @@ public function viewBeatLogs(Request $request)
             $q->whereDate('date', $date)
         );
 
-    // ✅ Company summary (filtered!)
+    //  Company summary (filtered!)
     $companyReasonCounts = (clone $baseQuery)
         ->join('students', 'students.id', '=', 'beat_assignment_logs.student_id')
         ->selectRaw('
@@ -2167,14 +2138,14 @@ public function viewBeatLogs(Request $request)
         ->get()
         ->keyBy('company_id');
 
-    // ✅ Daily subtotal (filtered!)
+    // Daily subtotal (filtered!)
     $dailyCounts = (clone $baseQuery)
         ->selectRaw('DATE(date) as day, COUNT(*) as total')
         ->groupBy('day')
         ->orderByDesc('day')
         ->get();
 
-    // ✅ Logs list
+    //  Logs list
     $logs = (clone $baseQuery)
         ->with(['student', 'guardArea', 'patrolArea'])
         ->orderByDesc('created_at')
