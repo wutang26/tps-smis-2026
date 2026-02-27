@@ -12,7 +12,7 @@ class DailyReport extends Model
     protected $fillable = [
         'report_date',
         'reported_by',
-        'department',
+        'company',
         'repeated_cases',
         'overloaded_cases',
         'last_assigned_date',

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('report_date');
             $table->foreignId('reported_by')->constrained('users');
-            $table->string('department')->nullable();
+            $table->foreignId('company')->constrained('companies');
             $table->text('repeated_cases')->nullable();
             $table->text('overloaded_cases')->nullable();
             $table->text('sick_cases')->nullable();

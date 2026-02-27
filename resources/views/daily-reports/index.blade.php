@@ -80,8 +80,19 @@
             font-family: 'Poppins', sans-serif;
             text-transform: capitalize;
             margin-bottom: 20px;
-            "
+        }
 
+        /* ========================
+           ACTION BUTTONS FIX
+        ======================== */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .action-buttons form {
+            margin: 0;
         }
     </style>
 
@@ -129,9 +140,18 @@
                                 <td>{{ $report->user->name ?? 'N/A' }}</td>
 
                                 {{-- Company --}}
-                                <td>{{ $report->company->name ?? 'N/A' }}</td>
+                                <td>
+                                    @if (!empty($report->company) && is_array($report->company))
+                                        <ul style="padding-left:15px; margin:0;">
+                                            @foreach ($report->company as $comp)
+                                                <li>{{ $comp }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
 
-                                {{-- Repeated Cases --}}
                                 {{-- Repeated Cases --}}
                                 <td>
                                     @if (!empty($report->repeated_cases) && is_array($report->repeated_cases))
@@ -145,9 +165,7 @@
                                     @endif
                                 </td>
 
-
                                 {{-- Assignments --}}
-                                {{-- Overloaded Cases --}}
                                 <td>
                                     @if (!empty($report->overloaded_cases) && is_array($report->overloaded_cases))
                                         <ul style="padding-left:15px; margin:0;">
@@ -187,8 +205,8 @@
 
                                 {{-- Emergency Cases --}}
                                 <td>
-                                    @if (!empty($report->emergency_cases))
-                                        <ul>
+                                    @if (!empty($report->emergency_cases) && is_array($report->emergency_cases))
+                                        <ul style="padding-left:15px; margin:0;">
                                             @foreach ($report->emergency_cases as $case)
                                                 <li>{{ $case }}</li>
                                             @endforeach
@@ -202,23 +220,26 @@
 
                                 {{-- Actions --}}
                                 <td>
-                                    @hasanyrole('Admin|Super Administrator|clerk|staff')
-                                        <a href="{{ route('daily-reports.edit', $report->id) }}"
-                                            class="btn btn-sm btn-warning">
-                                            Edit
-                                        </a>
-                                    @endhasanyrole
+                                    <div class="action-buttons">
+                                        @hasanyrole('Admin|Super Administrator|clerk|staff')
+                                            <a href="{{ route('daily-reports.edit', $report->id) }}"
+                                               class="btn btn-sm btn-warning">
+                                                Edit
+                                            </a>
+                                        @endhasanyrole
 
-                                    @hasanyrole('Admin|Super Administrator')
-                                        <form action="{{ route('daily-reports.destroy', $report->id) }}" method="POST"
-                                            onsubmit="return confirm('Are you sure?');" style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    @endhasanyrole
+                                        @hasanyrole('Admin|Super Administrator')
+                                            <form action="{{ route('daily-reports.destroy', $report->id) }}"
+                                                  method="POST"
+                                                  onsubmit="return confirm('Are you sure?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        @endhasanyrole
+                                    </div>
                                 </td>
                             </tr>
                         @empty

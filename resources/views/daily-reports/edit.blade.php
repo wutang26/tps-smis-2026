@@ -1,213 +1,374 @@
 @extends('layouts.main')
 
 @section('content')
+    <style>
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+        }
 
-<style>
-/* ===== PAGE LAYOUT ===== */
-.page-wrapper {
-    max-width: 1100px;
-    margin: auto;
-}
+        .form-card {
+            background: #fff;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
 
-.page-title {
-    font-size: 1.9rem;
-    font-weight: 600;
-    color: #1e293b;
-}
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 25px;
+        }
 
-/* ===== CARD DESIGN ===== */
-.form-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 35px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.06);
-    transition: 0.3s ease;
-}
+        .full-width {
+            grid-column: 1 / -1;
+        }
 
-.form-card:hover {
-    transform: translateY(-4px);
-}
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
 
-/* ===== GRID SYSTEM ===== */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #34495e;
+            font-size: 14px;
+        }
 
-.full-width {
-    grid-column: span 2;
-}
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+            padding: 10px 12px;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
 
-/* ===== FORM ELEMENTS ===== */
-.form-group label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #334155;
-    margin-bottom: 6px;
-    display: block;
-}
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+            outline: none;
+        }
 
-.form-control {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    font-size: 0.95rem;
-    transition: 0.3s;
-    background: #f8fafc;
-}
+        .add-btn {
+            margin-top: 5px;
+            padding: 6px 12px;
+            background: #3498db;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s ease;
+        }
 
-.form-control:focus {
-    border-color: #2563eb;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-    outline: none;
-}
+        .add-btn:hover {
+            background: #2563eb;
+        }
 
-textarea.form-control {
-    min-height: 110px;
-    resize: vertical;
-}
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745, #218838);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            transition: 0.2s ease;
+        }
 
-/* ===== BUTTONS ===== */
-.btn-primary-modern {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px 22px;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: 0.3s ease;
-}
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
 
-.btn-primary-modern:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
+        .alert-success {
+            background: #d4edda;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-.btn-outline-modern {
-    border: 1px solid #cbd5e1;
-    padding: 12px 22px;
-    border-radius: 10px;
-    background: white;
-    font-weight: 500;
-    color: #475569;
-    transition: 0.3s ease;
-}
+        .row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
 
-.btn-outline-modern:hover {
-    background: #f1f5f9;
-}
+        @media(max-width:768px) {
+            .form-grid,
+            .row-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-/* ===== ALERT ===== */
-.alert-success {
-    background: #dcfce7;
-    color: #166534;
-    padding: 12px 18px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
+        /* Center & reduce Sick Students width */
+        .sick-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-/* ===== RESPONSIVE ===== */
-@media(max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
+        /* Center Sick Add button */
+        .sick-wrapper .add-btn {
+            display: block;
+            margin: 10px auto 0 auto;
+        }
 
-    .full-width {
-        grid-column: span 1;
-    }
-}
-</style>
+        /* Center submit button */
+        .submit-centered {
+            width: 300px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 
-<div class="container py-5 page-wrapper">
+    <a href="{{ route('daily-reports.index') }}" style="display:inline-block; margin-bottom:15px;">&larr; Back</a>
 
-    <h2 class="page-title mb-4">Edit Daily Patrol Report</h2>
+    <div class="container py-4">
+        <h2 class="page-title">Edit Report Beat / Patrol</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
-    <form action="{{ route('daily-reports.update', $report->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+        <form action="{{ route('daily-reports.update', $report->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="form-card">
+                <div class="form-grid">
 
-        <div class="form-card">
+                    <!-- Date -->
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="report_date" class="form-control" value="{{ $report->report_date }}" required>
+                    </div>
 
-            <div class="form-grid">
+                    <!-- Department -->
+                    <div class="form-group">
+                        <label>Department / Company</label>
+                        <select name="company" class="form-control">
+                            <option value="">-- Select --</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}" {{ (isset($report->company) && $report->company == $company->id) ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date"
-                           name="report_date"
-                           class="form-control"
-                           value="{{ old('report_date', $report->report_date) }}"
-                           required>
+                    <!-- Repeated Students -->
+                    <div class="form-group">
+                        <label>Repeated Students</label>
+                        <div id="repeated-cases-container">
+                            @if(!empty($report->repeated_cases) && is_array($report->repeated_cases))
+                                @foreach($report->repeated_cases as $case)
+                                    <input type="text" name="repeated_cases[]" class="form-control mb-2" value="{{ $case }}">
+                                @endforeach
+                            @else
+                                <input type="text" name="repeated_cases[]" class="form-control mb-2" placeholder="Enter student name or case">
+                            @endif
+                        </div>
+                        <button type="button" class="add-btn" onclick="addInput('repeated-cases-container','repeated_cases[]')">+ Add More</button>
+                    </div>
+
+                    <!-- Assignments -->
+                    <div class="form-group">
+                        <label>Assignments & Last Date</label>
+                        <div id="overloaded-cases-container">
+                            @if(!empty($report->overloaded_cases) && is_array($report->overloaded_cases))
+                                @foreach($report->overloaded_cases as $key => $assignment)
+                                    <div class="assignment-row" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;">
+                                        <input type="text" name="overloaded_cases[]" class="form-control" value="{{ $assignment }}">
+                                        <input type="date" name="last_assigned_date[]" class="form-control" value="{{ $report->last_assigned_date[$key] ?? '' }}">
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="assignment-row" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;">
+                                    <input type="text" name="overloaded_cases[]" class="form-control" placeholder="Assignment">
+                                    <input type="date" name="last_assigned_date[]" class="form-control">
+                                </div>
+                            @endif
+                        </div>
+                        <button type="button" class="add-btn" onclick="addAssignmentRow()">+ Add More</button>
+                    </div>
+
+                    <!-- Sick Students -->
+                    <div class="form-group full-width sick-wrapper">
+                        <label>Sick Students</label>
+                        <div id="sick-students-container">
+                            @if(!empty($report->sick_student_names) && is_array($report->sick_student_names))
+                                @foreach($report->sick_student_names as $key => $name)
+                                    <div class="sick-row" style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; margin-bottom:6px;">
+                                        <input type="text" name="sick_student_names[]" class="form-control" value="{{ $name }}">
+                                        <select name="sick_student_platoon[]" class="form-control">
+                                            <option value="">-- Select Platoon --</option>
+                                            @foreach($platoons as $platoon)
+                                                <option value="{{ $platoon->id }}" {{ (isset($report->sick_student_platoon[$key]) && $report->sick_student_platoon[$key] == $platoon->id) ? 'selected' : '' }}>
+                                                    {{ $platoon->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <select name="company[]" class="form-control">
+                                            <option value="">-- Select Company --</option>
+                                            @foreach($companies as $company)
+                                                <option value="{{ $company->id }}" {{ (isset($report->company[$key]) && $report->company[$key] == $company->id) ? 'selected' : '' }}>
+                                                    {{ $company->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="sick-row" style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; margin-bottom:6px;">
+                                    <input type="text" name="sick_student_names[]" class="form-control" placeholder="Enter Student Name">
+                                    <select name="sick_student_platoon[]" class="form-control">
+                                        <option value="">-- Select Platoon --</option>
+                                        @foreach ($platoons as $platoon)
+                                            <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <select name="company[]" class="form-control">
+                                        <option value="">-- Select Company --</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+                        </div>
+                        <button type="button" class="add-btn" onclick="addSickRow()">+ Add More</button>
+                    </div>
+
+                    <!-- Vitengo & Challenges -->
+                    <div class="row-grid full-width">
+                        <div class="form-group">
+                            <label>Vitengo</label>
+                            <div id="vitengo-container">
+                                @if(!empty($report->vitengo_cases) && is_array($report->vitengo_cases))
+                                    @foreach($report->vitengo_cases as $vitengo)
+                                        <input type="text" name="vitengo_cases[]" class="form-control mb-2" value="{{ $vitengo }}">
+                                    @endforeach
+                                @else
+                                    <input type="text" name="vitengo_cases[]" class="form-control mb-2" placeholder="Enter Kitengo / Student Name">
+                                @endif
+                            </div>
+                            <button type="button" class="add-btn" onclick="addVitengoRow()">+ Add More</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Challenges Faced</label>
+                            <textarea name="challenges" class="form-control" rows="3">{{ $report->challenges }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Suggestions & Emergency -->
+                    <div class="row-grid full-width" style="margin-top:10px;">
+                        <div class="form-group">
+                            <label>Suggestions</label>
+                            <textarea name="suggestions" class="form-control" rows="4">{{ $report->suggestions }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Emergency Cases</label>
+                            <div id="emergency-container">
+                                @if(!empty($report->emergency_cases) && is_array($report->emergency_cases))
+                                    @foreach($report->emergency_cases as $case)
+                                        <input type="text" name="emergency_cases[]" class="form-control mb-2" value="{{ $case }}">
+                                    @endforeach
+                                @else
+                                    <input type="text" name="emergency_cases[]" class="form-control mb-2" placeholder="Enter Emergency Case">
+                                @endif
+                            </div>
+                            <button type="button" class="add-btn" onclick="addEmergencyRow()">+ Add More</button>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-group full-width" style="margin-top:15px;">
+                        <button type="submit" class="submit-btn submit-centered">
+                            Update Report
+                        </button>
+                    </div>
+
                 </div>
-
-                <div class="form-group">
-                    <label>Department / Unit</label>
-                    <input type="text"
-                           name="department"
-                           class="form-control"
-                           value="{{ old('department', $report->department) }}">
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Repeated Patrol Cases</label>
-                    <textarea name="repeated_cases"
-                              class="form-control">{{ old('repeated_cases', $report->repeated_cases) }}</textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Overloaded Trainees</label>
-                    <textarea name="overloaded_cases"
-                              class="form-control">{{ old('overloaded_cases', $report->overloaded_cases) }}</textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Sick Trainees</label>
-                    <textarea name="sick_cases"
-                              class="form-control">{{ old('sick_cases', $report->sick_cases) }}</textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Emergency Cases</label>
-                    <textarea name="emergency_cases"
-                              class="form-control">{{ old('emergency_cases', $report->emergency_cases) }}</textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Challenges</label>
-                    <textarea name="challenges"
-                              class="form-control">{{ old('challenges', $report->challenges) }}</textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Suggestions for Next Day</label>
-                    <textarea name="suggestions"
-                              class="form-control">{{ old('suggestions', $report->suggestions) }}</textarea>
-                </div>
-
             </div>
+        </form>
+    </div>
 
-            <div style="margin-top: 30px; display:flex; gap:15px;">
-                <button type="submit" class="btn-primary-modern">
-                    Update Report
-                </button>
-
-                <a href="{{ route('daily-reports.index') }}"
-                   class="btn-outline-modern">
-                    Cancel
-                </a>
-            </div>
-
+    <!-- Template for Sick Student Row -->
+    <template id="sick-student-template">
+        <div class="sick-row" style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; margin-bottom:6px;">
+            <input type="text" name="sick_student_names[]" class="form-control" placeholder="Enter Student Name">
+            <select name="sick_student_platoon[]" class="form-control">
+                <option value="">-- Select Platoon --</option>
+                @foreach ($platoons as $platoon)
+                    <option value="{{ $platoon->id }}">{{ $platoon->name }}</option>
+                @endforeach
+            </select>
+            <select name="company[]" class="form-control">
+                <option value="">-- Select Company --</option>
+                @foreach ($companies as $company)
+                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                @endforeach
+            </select>
         </div>
-    </form>
+    </template>
 
-</div>
+    <script>
+        function addInput(containerId, name) {
+            let container = document.getElementById(containerId);
+            let input = document.createElement('input');
+            input.type = 'text';
+            input.name = name;
+            input.className = 'form-control mb-2';
+            input.placeholder = 'Enter value';
+            container.appendChild(input);
+        }
 
+        function addAssignmentRow() {
+            const container = document.getElementById('overloaded-cases-container');
+            const row = document.createElement('div');
+            row.className = 'assignment-row';
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr 1fr';
+            row.style.gap = '10px';
+            row.style.marginBottom = '6px';
+            row.innerHTML = `
+                <input type="text" name="overloaded_cases[]" class="form-control" placeholder="Assignment">
+                <input type="date" name="last_assigned_date[]" class="form-control">
+            `;
+            container.appendChild(row);
+        }
+
+        function addSickRow() {
+            const container = document.getElementById('sick-students-container');
+            const template = document.getElementById('sick-student-template');
+            const clone = template.content.cloneNode(true);
+            container.appendChild(clone);
+        }
+
+        function addVitengoRow() {
+            const container = document.getElementById('vitengo-container');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'vitengo_cases[]';
+            input.className = 'form-control mb-2';
+            input.placeholder = 'Enter Kitengo / Student Name';
+            container.appendChild(input);
+        }
+
+        function addEmergencyRow() {
+            const container = document.getElementById('emergency-container');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'emergency_cases[]';
+            input.className = 'form-control mb-2';
+            input.placeholder = 'Enter Emergency Case';
+            container.appendChild(input);
+        }
+    </script>
 @endsection

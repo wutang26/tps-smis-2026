@@ -19,7 +19,10 @@ class FeedbackController extends Controller
         }
 
         $reports = DailyReport::with('user')->latest()->get();
-        return view('daily-reports.index', compact('reports'));
+
+        $companies = Company::orderBy('name')->get();
+
+        return view('daily-reports.index', compact('reports','companies'));
     }
 
     // Show create form
@@ -55,7 +58,6 @@ class FeedbackController extends Controller
         DailyReport::create([
             'report_date'           => $request->report_date,
             'reported_by'           => Auth::id(),
-            'department'            => $request->department,
             'repeated_cases'        => $request->repeated_cases ?? [],
             'overloaded_cases'      => $request->overloaded_cases ?? [],
             'last_assigned_date'    => $request->last_assigned_date ?? [],
@@ -94,7 +96,6 @@ class FeedbackController extends Controller
 
         $report->update([
             'report_date'           => $request->report_date,
-            'department'            => $request->department,
             'repeated_cases'        => $request->repeated_cases ?? [],
             'overloaded_cases'      => $request->overloaded_cases ?? [],
             'last_assigned_date'    => $request->last_assigned_date ?? [],
